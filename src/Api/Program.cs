@@ -1,7 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using StockFlow.Api.Endpoints;
+using StockFlow.Api.HostedServices;
 using StockFlow.Api.Middleware;
 using StockFlow.Application;
 using StockFlow.Infrastructure;
+using StockFlow.Infrastructure.ExternalServices.CountryStateCity;
+using StockFlow.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +15,22 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
 builder.Services.AddProblemDetails();
+
+// Address State/City reference-data lookups (see plan.md — Implementation):
+// IMemoryCache backs CachedCountryReferenceDataService (registered in
+// AddInfrastructure); the typed HttpClient talks to the external
+// countrystatecity.in API; the hosted service warms the states cache for
+// every supported Country at startup without blocking/failing startup.
+builder.Services.AddMemoryCache();
+builder.Services.Configure<CountryStateCityOptions>(builder.Configuration.GetSection(CountryStateCityOptions.SectionName));
+builder.Services.AddHttpClient<CountryStateCityApiClient>((serviceProvider, client) =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<CountryStateCityOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseUrl);
+    client.DefaultRequestHeaders.Add("X-CSCAPI-KEY", options.ApiKey);
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+builder.Services.AddHostedService<StatesCacheWarmupHostedService>();
 
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
 {
@@ -40,9 +61,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Local dev convenience only — applies any pending EF Core migrations on
+    // startup so `dotnet run` works without a separate `dotnet ef database
+    // update` step. Never runs outside Development; real environments apply
+    // migrations as an explicit, controlled deploy step.
+    using var migrationScope = app.Services.CreateScope();
+    var dbContext = migrationScope.ServiceProvider.GetRequiredService<StockFlowDbContext>();
+    await dbContext.Database.MigrateAsync();
 }
 
 app.MapProductEndpoints();
+app.MapLocationEndpoints();
 
 app.Run();
 

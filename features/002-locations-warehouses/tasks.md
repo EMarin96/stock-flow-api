@@ -1,20 +1,26 @@
 # 002 · Locations/warehouses — Tasks
 
-- [ ] Domain: create `LocationCode` value object (guard clauses via `DomainValidationException`) — `src/Domain/Locations/LocationCode.cs`
-- [ ] Domain: create `Address` value object (`Street`/`City`/`Country`, all-or-nothing guard clause) — `src/Domain/Locations/Address.cs`
-- [ ] Domain: create `Location : AuditableEntity` entity (`Code`, `Name`, `Address?`) — `src/Domain/Locations/Location.cs`
-- [ ] Infrastructure: configure EF Core mapping for `Location` (unique index on `Code`, `Address` as an owned type, Global Query Filter `!IsDeleted`)
-- [ ] Infrastructure: create and apply a new, additive EF Core migration (`AddLocationsTable`) for the Locations table
-- [ ] Infrastructure: implement Dapper read queries for `GetLocationById` and `GetLocations` (paginated), filtering `IsDeleted = false`
-- [ ] Application: `Shared/` — `ILocationWriteRepository`, `ILocationReadRepository`, `LocationDto`, `LocationMappingExtensions`, `LocationErrors`
-- [ ] Application: implement `CreateLocation` slice (Command + Handler + Validator, including the "all or none" address rule)
-- [ ] Application: implement `UpdateLocation` slice (Command + Handler + Validator)
-- [ ] Application: implement `DeleteLocation` slice (Command + Handler, soft delete)
-- [ ] Application: implement `GetLocationById` slice (Query + Handler)
-- [ ] Application: implement `GetLocations` slice (Query + Handler + Validator for page/pageSize)
-- [ ] Api: implement Minimal API endpoints for all 5 operations, wired to the Mediator — `src/Api/Endpoints/LocationEndpoints.cs`
-- [ ] Api: add Swagger annotations/response types to each endpoint
-- [ ] Tests: unit tests for each handler/validator, plus `LocationCodeTests`/`AddressTests` for the new value objects
-- [ ] Tests: integration tests for the 5 endpoints, including the Code-uniqueness race-condition/DB-constraint-translation case, the soft-delete Dapper-filter case, and the partial-address validation case — reusing the shared `PostgresContainerFixture`
-- [ ] Validate against the acceptance criteria in `spec.md`
-- [ ] Move the feature to "Done" in `constitution/roadmap.md`
+- [x] Domain: create `LocationCode` value object (guard clauses via `DomainValidationException`) — `src/Domain/Locations/LocationCode.cs`
+- [x] Domain: create `Country` enum (`US`, `CR`) — `src/Domain/Locations/Country.cs`
+- [x] Domain: rework `Address` value object — `State`/`City`/`Country` unconditionally required (no more all-or-nothing), `AddressLine1/2/3` stay independently optional — `src/Domain/Locations/Address.cs`
+- [x] Domain: rework `Location : AuditableEntity` — `Address` becomes non-nullable; `Create`/`Update` take required `state`/`city`/`country` — `src/Domain/Locations/Location.cs`
+- [x] Infrastructure: rework EF Core mapping — `Address` owned type becomes required, `State`/`City`/`Country` columns `NOT NULL`
+- [x] Infrastructure: regenerate the `AddLocationsTable` migration again in place (still unmerged)
+- [x] Infrastructure: implement Dapper read queries for `GetLocationById` and `GetLocations` (paginated), filtering `IsDeleted = false`
+- [x] Application: `Shared/ICountryReferenceDataService.cs` — interface for state/city reference-data lookups
+- [x] Infrastructure: `ExternalServices/CountryStateCity/` — `CountryStateCityOptions`, `CountryStateCityApiClient` (typed `HttpClient`), `CachedCountryReferenceDataService` (`IMemoryCache`: states eager per-country, cities lazy per country+state)
+- [x] Api: `Program.cs` — register `AddHttpClient`, `AddMemoryCache`, `CountryStateCityOptions` binding, and the states-warmup `IHostedService` (non-blocking on failure)
+- [x] Api: `Program.cs` — auto-apply EF Core migrations on startup in Development only, for local-run convenience
+- [x] Tests: `InMemoryCountryReferenceDataService` test double, registered in `LocationApiFactory` via `ConfigureTestServices`
+- [x] Application: rework `Shared/` — `LocationDto` (`State`/`City`/`Country` become non-nullable), `LocationMappingExtensions`; remove `AddressValidationExtensions` (no longer needed)
+- [x] Application: rework `CreateLocation` slice — `State`/`City`/`Country` required in Command/Validator (plain `NotEmpty()`/`IsInEnum()`, no conditional rule); Handler always validates against `ICountryReferenceDataService`
+- [x] Application: rework `UpdateLocation` slice — same as Create
+- [x] Application: implement `DeleteLocation` slice (Command + Handler, soft delete)
+- [x] Application: implement `GetLocationById` slice (Query + Handler)
+- [x] Application: implement `GetLocations` slice (Query + Handler + Validator for page/pageSize)
+- [x] Api: rework `LocationEndpoints.cs` request/response records — `State`/`City`/`Country` required, address lines optional
+- [x] Api: add Swagger annotations/response types to each endpoint
+- [x] Tests: rework `AddressTests`/`LocationTests` — confirm `State`/`City`/`Country` unconditionally required, address lines independently optional; remove obsolete partial-trio/all-or-none/no-address cases
+- [x] Tests: rework the 5 integration tests — replace "no address" and "address-line-only" success cases with the new required-trio behavior; keep invalid-state/city and reference-data-unavailable cases
+- [x] Validate against the acceptance criteria in `spec.md`
+- [x] Move the feature to "Done" in `constitution/roadmap.md`
