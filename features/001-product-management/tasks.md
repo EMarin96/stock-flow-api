@@ -1,19 +1,21 @@
 # 001 · Product management — Tasks
 
-- [ ] Domain: create `Entity` base class (Id: Guid) — `src/Domain/Common/Entity.cs`
-- [ ] Domain: create `AuditableEntity : Entity` (CreatedAt/CreatedBy, UpdatedAt/UpdatedBy, IsDeleted/DeletedAt) — `src/Domain/Common/AuditableEntity.cs`
-- [ ] Domain: create `Product : AuditableEntity` entity (Sku, Name, Description, UnitOfMeasure, Price, MinimumStockThreshold) — `src/Domain/Products/Product.cs`
-- [ ] Infrastructure: configure EF Core mapping for `Product` (unique index on Sku, Global Query Filter `!IsDeleted`)
-- [ ] Infrastructure: create and apply EF Core migration for the Products table
-- [ ] Infrastructure: implement Dapper read queries for `GetProductById` and `GetProducts` (paginated), filtering `IsDeleted = false`
-- [ ] Application: implement `CreateProduct` slice (Command + Handler + Validator)
-- [ ] Application: implement `UpdateProduct` slice (Command + Handler + Validator)
-- [ ] Application: implement `DeleteProduct` slice (Command + Handler, soft delete)
-- [ ] Application: implement `GetProductById` slice (Query + Handler)
-- [ ] Application: implement `GetProducts` slice (Query + Handler + Validator for page/pageSize)
-- [ ] Api: implement Minimal API endpoints for all 5 operations, wired to the Mediator — `src/Api/Endpoints/ProductEndpoints.cs`
-- [ ] Api: add Swagger annotations/response types to each endpoint
-- [ ] Tests: unit tests for each handler and validator
-- [ ] Tests: integration tests for the 5 endpoints, including the SKU-uniqueness race-condition/DB-constraint-translation case and the soft-delete Dapper-filter case
-- [ ] Validate against the acceptance criteria in `spec.md`
-- [ ] Move the feature to "Done" in `constitution/roadmap.md`
+- [x] Domain: create `Entity` base class (Id: Guid) — `src/Domain/Common/Entity.cs`
+- [x] Domain: create `AuditableEntity : Entity` (CreatedAt/CreatedBy, UpdatedAt/UpdatedBy, IsDeleted/DeletedAt) — `src/Domain/Common/AuditableEntity.cs`
+- [x] Domain: create `Product : AuditableEntity` entity (Sku, Name, Description, UnitOfMeasure, Price, MinimumStockThreshold) — `src/Domain/Products/Product.cs`
+- [x] Infrastructure: configure EF Core mapping for `Product` (unique index on Sku, Global Query Filter `!IsDeleted`)
+- [x] Infrastructure: create and apply EF Core migration for the Products table
+- [x] Infrastructure: implement Dapper read queries for `GetProductById` and `GetProducts` (paginated), filtering `IsDeleted = false`
+- [x] Application: implement `CreateProduct` slice (Command + Handler + Validator)
+- [x] Application: implement `UpdateProduct` slice (Command + Handler + Validator)
+- [x] Application: implement `DeleteProduct` slice (Command + Handler, soft delete)
+- [x] Application: implement `GetProductById` slice (Query + Handler)
+- [x] Application: implement `GetProducts` slice (Query + Handler + Validator for page/pageSize)
+- [x] Api: implement Minimal API endpoints for all 5 operations, wired to the Mediator — `src/Api/Endpoints/ProductEndpoints.cs`
+- [x] Api: add Swagger annotations/response types to each endpoint
+- [x] Tests: unit tests for each handler and validator
+- [x] Tests: integration tests for the 5 endpoints, including the SKU-uniqueness race-condition/DB-constraint-translation case and the soft-delete Dapper-filter case
+- [x] Validate against the acceptance criteria in `spec.md`
+- [x] Refactor: introduce `IUnitOfWork` to centralize `SaveChangesAsync` and DB unique-constraint-violation translation; update `ProductWriteRepository` and the `CreateProduct`/`UpdateProduct`/`DeleteProduct` handlers and their tests accordingly
+- [x] Refactor: introduce `Sku` and `Money` (with `Currency`) Value Objects on `Product`, with `DomainValidationException` guard clauses; add `Currency` field to `CreateProduct`/`UpdateProduct`; update EF Core configuration/migration, Dapper read repository/DTO, and all affected tests
+- [x] Move the feature to "Done" in `constitution/roadmap.md`

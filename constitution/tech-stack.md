@@ -20,7 +20,7 @@ Clean Architecture, split into 4 projects (one per layer):
 ## Commands
 
 - `docker-compose up` — starts the local dev environment (API + PostgreSQL).
-- `dotnet test` — runs the full test suite.
+- `dotnet test` — runs the full test suite. Integration tests spin up a disposable PostgreSQL container via Testcontainers, so Docker must be running locally, but no manual `docker-compose up` step is needed just for tests.
 - `dotnet format` — formats and checks code style per `.editorconfig`, backed by Roslyn/StyleCop analyzers for additional rules.
 - `dotnet build` — builds the solution.
 
@@ -41,6 +41,8 @@ Clean Architecture, split into 4 projects (one per layer):
 - **Error handling / validation:** Result pattern for expected/business errors (no exceptions used for control flow), FluentValidation for input validation, and a global exception-handling middleware that translates unhandled failures into `ProblemDetails`.
 - **Project-specific patterns to follow:**
   - CQRS — commands and queries are separated; EF Core handles writes, Dapper handles reads.
+  - Repository pattern (write-side) + Unit of Work — each write-side aggregate has a repository (e.g. `IProductWriteRepository`) for tracking/lookups; a single `IUnitOfWork.SaveChangesAsync()` centralizes the commit and the translation of database errors (e.g. unique constraint violations), avoiding duplicating that handling in every repository and enabling atomic operations across multiple entities (needed later for `StockMovement` `TRANSFER`).
+  - Value Objects for Domain invariants (e.g. `Sku`, `Money`) — self-validate via guard clauses that throw a Domain-level `DomainValidationException`, not the Application-layer `Result<T>` (Domain must not depend on Application). Primitive→VO conversion happens only inside the owning entity; outer layers keep using primitives, except dependency-free enums (e.g. `Currency`), which flow through as typed values.
   - A custom, in-house Mediator implementation (not the MediatR library, due to its paid license).
   - Options Pattern for configuration access (`appsettings`).
   - Structured logging with Serilog.
@@ -50,6 +52,7 @@ Clean Architecture, split into 4 projects (one per layer):
   - A standard pagination pattern on list endpoints.
   - JWT-based authentication with role-based authorization (admin/operator/read-only).
   - Idempotency keys on write endpoints.
+  - When the same `Error` (same code/message template) is used in more than one place within a feature, define it once as a static factory in that feature's `Shared/` folder (e.g. `ProductErrors.cs`) and reuse it, instead of duplicating the `Error.X(...)` call.
 
 ## Hard limits
 

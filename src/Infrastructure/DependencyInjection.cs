@@ -1,0 +1,28 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using StockFlow.Application.Common.Persistence;
+using StockFlow.Application.Products.Shared;
+using StockFlow.Infrastructure.Persistence;
+using StockFlow.Infrastructure.Persistence.Read;
+using StockFlow.Infrastructure.Persistence.Repositories;
+
+namespace StockFlow.Infrastructure;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("StockFlowDatabase")
+            ?? throw new InvalidOperationException("Connection string 'StockFlowDatabase' was not found.");
+
+        services.AddDbContext<StockFlowDbContext>(options => options.UseNpgsql(connectionString));
+
+        services.AddScoped<ISqlConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
+
+        services.AddScoped<IProductWriteRepository, ProductWriteRepository>();
+        services.AddScoped<IProductReadRepository, ProductReadRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        return services;
+    }
+}

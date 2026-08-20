@@ -2,11 +2,11 @@
 
 ## Done ✅
 
-_None yet._
+1. **001 · Product management** — basic CRUD for products (SKU, minimum stock threshold).
 
 ## Next 🔜
 
-1. **001 · Product management** — basic CRUD for products (SKU, minimum stock threshold).
+_None yet._
 
 ## Backlog / ideas 💡
 
