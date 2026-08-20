@@ -57,6 +57,6 @@ Clean Architecture, split into 4 projects (one per layer):
 ## Hard limits
 
 - Never commit secrets or credentials (`.env`, `appsettings.Production.json`, real connection strings, etc.) to the repo.
-- Never add a new NuGet dependency without checking with the project owner first (MediatR was already ruled out for this exact reason, due to its license).
+- Never add a new NuGet dependency without checking with the project owner first (MediatR was already ruled out for this exact reason, due to its license; `Microsoft.Extensions.Caching.Memory` was approved for `IMemoryCache` in `Infrastructure` — first-party Microsoft package, MIT license, no cost).
 - Never bypass the Result pattern with exceptions used for control flow — exceptions are reserved for truly unexpected errors.
 - Never modify or delete existing `StockMovement` records — the table is append-only; only insert new records, to preserve traceability and audit history.

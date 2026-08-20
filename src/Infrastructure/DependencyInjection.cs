@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StockFlow.Application.Common.Persistence;
+using StockFlow.Application.Locations.Shared;
 using StockFlow.Application.Products.Shared;
+using StockFlow.Infrastructure.ExternalServices.CountryStateCity;
 using StockFlow.Infrastructure.Persistence;
 using StockFlow.Infrastructure.Persistence.Read;
 using StockFlow.Infrastructure.Persistence.Repositories;
@@ -21,7 +23,15 @@ public static class DependencyInjection
 
         services.AddScoped<IProductWriteRepository, ProductWriteRepository>();
         services.AddScoped<IProductReadRepository, ProductReadRepository>();
+        services.AddScoped<ILocationWriteRepository, LocationWriteRepository>();
+        services.AddScoped<ILocationReadRepository, LocationReadRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // CountryStateCityApiClient (typed HttpClient), IMemoryCache, and the
+        // states-cache warm-up hosted service are registered in Program.cs, since
+        // AddHttpClient/AddMemoryCache/AddHostedService are Api-layer (ASP.NET
+        // Core host) concerns (see plan.md — Implementation).
+        services.AddScoped<ICountryReferenceDataService, CachedCountryReferenceDataService>();
 
         return services;
     }
