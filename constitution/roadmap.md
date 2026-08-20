@@ -6,13 +6,12 @@
 
 ## Next 🔜
 
-_None yet._
+1. **002 · Locations/warehouses** — location management and multi-warehouse support.
 
 ## Backlog / ideas 💡
 
 - **Authentication and user roles** — login + JWT + admin/operator/read-only roles.
 - **Stock movements** — IN/OUT/TRANSFER/ADJUSTMENT, following the rules already defined in `tech-stack.md`.
-- **Locations/warehouses** — location management and multi-warehouse support.
 - **Low-stock alerts** — notify when a product falls below its minimum stock threshold.
 - **Reporting / read-only views** — reporting endpoints for the read-only role.
 
