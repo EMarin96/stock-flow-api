@@ -7,11 +7,14 @@
 
 ## Branch naming
 
-- `feature/NNN-feature-name`, matching the corresponding `features/NNN-feature-name/` folder (e.g. `feature/001-product-management`).
+- `feature/NNN-feature-name`, matching the corresponding `features/NNN-feature-name/` folder (e.g. `feature/001-product-management`), for code.
+- `docs/NNN-feature-name`, for a feature's `spec.md`/`plan.md`/`tasks.md` PR, before the code branch is cut.
 
 ## When to branch
 
-- Only after `spec.md`, `plan.md`, and `tasks.md` are written and approved on `development`. Documentation lives on `development`; code lives on the feature branch.
+- `main` and `development` are protected — every change to them, including documentation, goes through a PR (no direct pushes, not even for the repo owner/admin).
+- Once `spec.md`, `plan.md`, and `tasks.md` are written and approved, open a short-lived `docs/NNN-feature-name` PR into `development` for them.
+- After that docs PR is merged, cut `feature/NNN-feature-name` off `development` for the actual code.
 
 ## Commit messages
 
