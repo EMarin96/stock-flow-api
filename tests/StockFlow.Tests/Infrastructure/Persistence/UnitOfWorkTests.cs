@@ -4,6 +4,7 @@ using StockFlow.Domain.Locations;
 using StockFlow.Domain.Products;
 using StockFlow.Domain.StockMovements;
 using StockFlow.Infrastructure.Persistence;
+using StockFlow.Tests;
 using StockFlow.Tests.Api;
 
 namespace StockFlow.Tests.Infrastructure.Persistence;
@@ -36,8 +37,7 @@ public sealed class UnitOfWorkTests : IAsyncLifetime
         _dbContext = new StockFlowDbContext(options);
 
         await _dbContext.Database.MigrateAsync();
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            """TRUNCATE TABLE "StockMovements", "StockLevels", "Locations", "Products";""");
+        await _dbContext.Database.ExecuteSqlRawAsync(TestDatabase.TruncateAllTablesSql);
     }
 
     public Task DisposeAsync() => _dbContext.DisposeAsync().AsTask();

@@ -10,11 +10,12 @@ using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Domain.Locations;
 using StockFlow.Domain.Products;
 using StockFlow.Domain.StockMovements;
+using StockFlow.Tests.Api;
 
 namespace StockFlow.Tests.Api.StockMovements;
 
 [Collection("Postgres collection")]
-public class StockMovementEndpointsTests : IClassFixture<StockMovementApiFactoryFixture>, IAsyncLifetime
+public class StockMovementEndpointsTests : IClassFixture<ApiFactoryFixture>, IAsyncLifetime
 {
     // Mirrors the server's JsonStringEnumConverter registration (Program.cs), so
     // the test client can round-trip MovementType/MovementDirection/Country as
@@ -24,10 +25,10 @@ public class StockMovementEndpointsTests : IClassFixture<StockMovementApiFactory
         Converters = { new JsonStringEnumConverter() },
     };
 
-    private readonly StockMovementApiFactory _factory;
+    private readonly ApiFactory _factory;
     private readonly HttpClient _client;
 
-    public StockMovementEndpointsTests(StockMovementApiFactoryFixture factoryFixture)
+    public StockMovementEndpointsTests(ApiFactoryFixture factoryFixture)
     {
         _factory = factoryFixture.Factory;
         _client = _factory.CreateClient();

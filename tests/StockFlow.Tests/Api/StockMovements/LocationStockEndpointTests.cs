@@ -10,28 +10,30 @@ using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Domain.Locations;
 using StockFlow.Domain.Products;
 using StockFlow.Domain.StockMovements;
+using StockFlow.Tests.Api;
 
 namespace StockFlow.Tests.Api.StockMovements;
 
 /// <summary>
 /// Covers GET /api/locations/{locationId}/products — lives here (not under
-/// Api/Locations) because it needs Product + StockMovement fixtures too, and
-/// this factory already truncates every table this feature touches (see
+/// Api/Locations) because it needs Product + StockMovement fixtures too (see
 /// plan.md — Implementation, step 16, for why the endpoint itself lives in
 /// LocationEndpoints.cs while remaining conceptually part of this feature).
+/// The shared ApiFactory truncates every table regardless, so no factory
+/// distinction is needed here anymore.
 /// </summary>
 [Collection("Postgres collection")]
-public class LocationStockEndpointTests : IClassFixture<StockMovementApiFactoryFixture>, IAsyncLifetime
+public class LocationStockEndpointTests : IClassFixture<ApiFactoryFixture>, IAsyncLifetime
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
         Converters = { new JsonStringEnumConverter() },
     };
 
-    private readonly StockMovementApiFactory _factory;
+    private readonly ApiFactory _factory;
     private readonly HttpClient _client;
 
-    public LocationStockEndpointTests(StockMovementApiFactoryFixture factoryFixture)
+    public LocationStockEndpointTests(ApiFactoryFixture factoryFixture)
     {
         _factory = factoryFixture.Factory;
         _client = _factory.CreateClient();
