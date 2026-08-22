@@ -1,0 +1,24 @@
+# 003 · Stock movements — Tasks
+
+- [ ] Domain: create `MovementType` enum (`In`/`Out`/`Transfer`/`Adjustment`) — `src/Domain/StockMovements/MovementType.cs`
+- [ ] Domain: create `MovementDirection` enum (`Increase`/`Decrease`) — `src/Domain/StockMovements/MovementDirection.cs`
+- [ ] Domain: create `StockMovement : Entity` with `Create(...)` guard clauses (positive quantity; per-`Type` location-field requirements; `Direction` required iff `Adjustment`) — `src/Domain/StockMovements/StockMovement.cs`
+- [ ] Domain: create `StockLevel : Entity` with `Create(...)`, `Increase(...)`, `Decrease(...)` (guard clause on negative result) — `src/Domain/StockMovements/StockLevel.cs`
+- [ ] Application: `Shared/` — `IStockMovementWriteRepository`, `IStockLevelRepository`, `IStockMovementReadRepository`, `IStockLevelReadRepository`, `StockMovementDto`, `LocationStockDto`, mapping extensions, `StockMovementErrors`
+- [ ] Application: implement `CreateStockMovement` slice (Command + Validator + Handler — product/location existence checks, cross-country transfer check, `StockLevel` mutation, insufficient-stock rejection)
+- [ ] Application: implement `GetStockMovements` slice (Query + Validator + Handler — paginated, filter by product/location/type)
+- [ ] Application: implement `GetLocationStock` slice (Query + Validator + Handler — paginated, filter by product name, includes zero-stock rows)
+- [ ] Infrastructure: configure EF Core mapping for `StockMovement` (FKs to Products/Locations, enum conversions) — `StockMovementConfiguration.cs`
+- [ ] Infrastructure: configure EF Core mapping for `StockLevel` (composite unique index, FKs, `CHECK (Quantity >= 0)` constraint) — `StockLevelConfiguration.cs`
+- [ ] Infrastructure: implement `StockMovementWriteRepository` (`Add`) and `StockLevelRepository` (`GetOrCreateAsync`)
+- [ ] Infrastructure: implement Dapper read queries for `GetStockMovements` (paginated/filtered) and `GetLocationStock` (paginated/filtered, joined to Products)
+- [ ] Infrastructure: extend `IUnitOfWork`'s DB-error translation to map a `StockLevels` check-constraint violation to `StockMovementErrors.InsufficientStock`
+- [ ] Infrastructure: create and apply EF Core migration `AddStockMovementsAndStockLevelsTables`
+- [ ] Api: implement `POST /api/stock-movements` and `GET /api/stock-movements` — `src/Api/Endpoints/StockMovementEndpoints.cs`
+- [ ] Api: implement `GET /api/locations/{locationId}/products` in `src/Api/Endpoints/LocationEndpoints.cs`
+- [ ] Api: add Swagger annotations/response types to each new endpoint
+- [ ] Tests: unit tests for `StockMovement.Create` and `StockLevel.Increase`/`Decrease` guard clauses
+- [ ] Tests: unit tests for each handler and validator, including insufficient-stock and cross-country-transfer rejections
+- [ ] Tests: integration tests for all 3 endpoints, including the `StockLevels` check-constraint race case
+- [ ] Validate against the acceptance criteria in `spec.md`
+- [ ] Move the feature to "Done" in `constitution/roadmap.md`

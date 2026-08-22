@@ -26,8 +26,9 @@ Clean Architecture, split into 4 projects (one per layer):
 
 ## Data / domain model
 
-- `Product` — unique SKU per product; defines a minimum stock threshold that triggers a restock alert. Current stock is **not** a direct field — it's calculated from its `StockMovement` records.
+- `Product` — unique SKU per product; defines a minimum stock threshold that triggers a restock alert.
 - `StockMovement` — fixed types: `IN` / `OUT` / `TRANSFER` / `ADJUSTMENT`. Stock can never go negative. Movements are immutable (append-only) — corrections are made via an inverse movement, never by editing or deleting an existing one.
+- `StockLevel` — the current stock balance for one product+location pair, per `tech-stack.md`'s `Location` bullet below. It's a **materialized** field, not computed on every read: it's updated atomically, as a side effect of processing a `StockMovement`, in the same transaction as the movement insert. A client never sets it directly — it only ever changes as a consequence of a movement. A DB-level `CHECK (Quantity >= 0)` constraint backs the negative-stock guard as a final safety net alongside the Application-layer check.
 - `Location` (warehouse) — stock is calculated per product + location combination, not globally. A `TRANSFER` movement affects two locations at once (subtracts from the source, adds to the destination).
 - `User` — each user has exactly one fixed role (`admin` / `operator` / `read-only`) that determines their permissions.
 
