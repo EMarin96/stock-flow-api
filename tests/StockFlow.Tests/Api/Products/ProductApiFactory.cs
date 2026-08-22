@@ -59,6 +59,11 @@ public sealed class ProductApiFactory : WebApplicationFactory<Program>
     {
         using var scope = Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<StockFlowDbContext>();
-        await dbContext.Database.ExecuteSqlRawAsync("""TRUNCATE TABLE "Products";""");
+
+        // Products is now referenced by StockMovements/StockLevels FKs (feature
+        // 003) — Postgres requires every FK-related table to be truncated
+        // together, even though this test class only exercises Products itself.
+        await dbContext.Database.ExecuteSqlRawAsync(
+            """TRUNCATE TABLE "StockMovements", "StockLevels", "Locations", "Products";""");
     }
 }

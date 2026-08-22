@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using StockFlow.Application.Common.Persistence;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Application.Products.Shared;
+using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Infrastructure.ExternalServices.CountryStateCity;
 using StockFlow.Infrastructure.Persistence;
 using StockFlow.Infrastructure.Persistence.Read;
@@ -25,6 +26,10 @@ public static class DependencyInjection
         services.AddScoped<IProductReadRepository, ProductReadRepository>();
         services.AddScoped<ILocationWriteRepository, LocationWriteRepository>();
         services.AddScoped<ILocationReadRepository, LocationReadRepository>();
+        services.AddScoped<IStockMovementWriteRepository, StockMovementWriteRepository>();
+        services.AddScoped<IStockMovementReadRepository, StockMovementReadRepository>();
+        services.AddScoped<IStockLevelRepository, StockLevelRepository>();
+        services.AddScoped<IStockLevelReadRepository, StockLevelReadRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         // CountryStateCityApiClient (typed HttpClient), IMemoryCache, and the
