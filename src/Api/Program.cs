@@ -73,6 +73,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapProductEndpoints();
 app.MapLocationEndpoints();
+app.MapStockMovementEndpoints();
 
 app.Run();
 

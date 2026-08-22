@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace StockFlow.Infrastructure.Persistence.Read;
+namespace StockFlow.Infrastructure.Persistence.Dapper;
 
 /// <summary>
 /// Creates raw ADO.NET connections for Dapper read queries, kept separate from

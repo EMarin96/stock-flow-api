@@ -6,11 +6,12 @@ using StockFlow.Api.Endpoints;
 using StockFlow.Application.Common.Pagination;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Domain.Locations;
+using StockFlow.Tests.Api;
 
 namespace StockFlow.Tests.Api.Locations;
 
 [Collection("Postgres collection")]
-public class LocationEndpointsTests : IClassFixture<LocationApiFactoryFixture>, IAsyncLifetime
+public class LocationEndpointsTests : IClassFixture<ApiFactoryFixture>, IAsyncLifetime
 {
     // Mirrors the server's JsonStringEnumConverter registration (Program.cs), so
     // the test client can round-trip the Country enum as "US"/"CR" strings too.
@@ -19,10 +20,10 @@ public class LocationEndpointsTests : IClassFixture<LocationApiFactoryFixture>, 
         Converters = { new JsonStringEnumConverter() },
     };
 
-    private readonly LocationApiFactory _factory;
+    private readonly ApiFactory _factory;
     private readonly HttpClient _client;
 
-    public LocationEndpointsTests(LocationApiFactoryFixture factoryFixture)
+    public LocationEndpointsTests(ApiFactoryFixture factoryFixture)
     {
         _factory = factoryFixture.Factory;
         _client = _factory.CreateClient();

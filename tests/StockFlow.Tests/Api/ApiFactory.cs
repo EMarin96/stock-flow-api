@@ -4,22 +4,26 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using StockFlow.Application.Locations.Shared;
 using StockFlow.Infrastructure.Persistence;
-using StockFlow.Infrastructure.Persistence.Read;
+using StockFlow.Infrastructure.Persistence.Dapper;
+using StockFlow.Tests;
 
-namespace StockFlow.Tests.Api.Products;
+namespace StockFlow.Tests.Api;
 
 /// <summary>
 /// Boots the API against a disposable Postgres database provided by a
 /// Testcontainers container (see <see cref="PostgresContainerFixture"/>) and
 /// applies migrations before the first request, per the integration-test
-/// convention in tasks.md.
+/// convention in tasks.md. Shared across every feature's API tests — the DI
+/// swaps and reset logic below are identical regardless of which feature's
+/// endpoints a given test class exercises.
 /// </summary>
-public sealed class ProductApiFactory : WebApplicationFactory<Program>
+public sealed class ApiFactory : WebApplicationFactory<Program>
 {
     private readonly string _connectionString;
 
-    public ProductApiFactory(string connectionString)
+    public ApiFactory(string connectionString)
     {
         _connectionString = connectionString;
     }
@@ -38,6 +42,12 @@ public sealed class ProductApiFactory : WebApplicationFactory<Program>
             // it must be swapped too, or read queries would silently keep hitting the dev DB.
             services.RemoveAll<ISqlConnectionFactory>();
             services.AddScoped<ISqlConnectionFactory>(_ => new NpgsqlConnectionFactory(_connectionString));
+
+            // Tests must never call the real countrystatecity.in API — swap in a
+            // fixed, hardcoded fake (see 002's plan.md — Decisions). Registered
+            // unconditionally: harmless no-op for tests that never touch Locations.
+            services.RemoveAll<ICountryReferenceDataService>();
+            services.AddSingleton<ICountryReferenceDataService, InMemoryCountryReferenceDataService>();
         });
 
         base.ConfigureWebHost(builder);
@@ -55,10 +65,15 @@ public sealed class ProductApiFactory : WebApplicationFactory<Program>
         await dbContext.Database.MigrateAsync();
     }
 
+    /// <summary>
+    /// Truncates every table any feature's API tests can write to, in a single
+    /// statement — Postgres requires all FK-related tables to be truncated
+    /// together (StockLevels/StockMovements both FK to Products and Locations).
+    /// </summary>
     public async Task ResetDatabaseAsync()
     {
         using var scope = Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<StockFlowDbContext>();
-        await dbContext.Database.ExecuteSqlRawAsync("""TRUNCATE TABLE "Products";""");
+        await dbContext.Database.ExecuteSqlRawAsync(TestDatabase.TruncateAllTablesSql);
     }
 }

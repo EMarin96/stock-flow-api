@@ -1,7 +1,8 @@
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Domain.Locations;
+using StockFlow.Infrastructure.Persistence;
 
-namespace StockFlow.Infrastructure.Persistence.Repositories;
+namespace StockFlow.Infrastructure.Persistence.Repositories.Locations;
 
 public sealed class LocationWriteRepository(StockFlowDbContext dbContext) : ILocationWriteRepository
 {

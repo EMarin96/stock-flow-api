@@ -1,9 +1,8 @@
 using Dapper;
 using StockFlow.Application.Common.Pagination;
 using StockFlow.Application.Locations.Shared;
-using StockFlow.Infrastructure.Persistence.Read;
 
-namespace StockFlow.Infrastructure.Persistence.Repositories;
+namespace StockFlow.Infrastructure.Persistence.Repositories.Locations;
 
 /// <summary>
 /// Dapper-backed read repository for locations. Every query filters

@@ -12,19 +12,19 @@ Users can register stock movements (`IN`, `OUT`, `TRANSFER`, `ADJUSTMENT`) for a
 
 ## Acceptance criteria
 
-- [ ] A movement can be created with a product, type (`IN`/`OUT`/`TRANSFER`/`ADJUSTMENT`), and a positive quantity.
-- [ ] `IN` requires a `DestinationLocationId`; `OUT` requires a `SourceLocationId`; `TRANSFER` requires both; `ADJUSTMENT` requires a `DestinationLocationId` (the location being corrected) and a `Direction` (`Increase`/`Decrease`).
-- [ ] Creating a movement with a location field that its type doesn't use (e.g. a `SourceLocationId` on an `IN`) is rejected with a clear validation error.
-- [ ] Creating a movement missing a location field its type requires is rejected with a clear validation error.
-- [ ] `Direction` is required when `Type` is `ADJUSTMENT` and rejected as invalid when present for any other type.
-- [ ] Creating a movement with a quantity that is zero or negative is rejected with a clear validation error.
-- [ ] Creating a movement referencing a product or location that doesn't exist (or is soft-deleted) is rejected with a clear validation error, not a generic failure.
-- [ ] A `TRANSFER` whose source and destination locations are in different countries is rejected with a clear validation error.
-- [ ] A movement that would leave the product's stock at a location negative (`OUT`, `TRANSFER` from that location, or `ADJUSTMENT`/`Decrease`) is rejected with a clear business error — stock never goes negative.
-- [ ] Movements can be listed with pagination, optionally filtered by product, location (matching either source or destination), and/or type.
-- [ ] A location's products and their current stock can be listed, paginated and optionally filtered by product name — including products whose stock is currently zero.
-- [ ] Creating a movement updates the affected location(s)' stock balance atomically, in the same operation as recording the movement — the two are never left inconsistent with each other.
-- [ ] Every movement record carries who created it and when — there is no "last updated," since movements are never edited.
+- [x] A movement can be created with a product, type (`IN`/`OUT`/`TRANSFER`/`ADJUSTMENT`), and a positive quantity.
+- [x] `IN` requires a `DestinationLocationId`; `OUT` requires a `SourceLocationId`; `TRANSFER` requires both; `ADJUSTMENT` requires a `DestinationLocationId` (the location being corrected) and a `Direction` (`Increase`/`Decrease`).
+- [x] Creating a movement with a location field that its type doesn't use (e.g. a `SourceLocationId` on an `IN`) is rejected with a clear validation error.
+- [x] Creating a movement missing a location field its type requires is rejected with a clear validation error.
+- [x] `Direction` is required when `Type` is `ADJUSTMENT` and rejected as invalid when present for any other type.
+- [x] Creating a movement with a quantity that is zero or negative is rejected with a clear validation error.
+- [x] Creating a movement referencing a product or location that doesn't exist (or is soft-deleted) is rejected with a clear validation error, not a generic failure.
+- [x] A `TRANSFER` whose source and destination locations are in different countries is rejected with a clear validation error.
+- [x] A movement that would leave the product's stock at a location negative (`OUT`, `TRANSFER` from that location, or `ADJUSTMENT`/`Decrease`) is rejected with a clear business error — stock never goes negative.
+- [x] Movements can be listed with pagination, optionally filtered by product, location (matching either source or destination), and/or type.
+- [x] A location's products and their current stock can be listed, paginated and optionally filtered by product name — including products whose stock is currently zero.
+- [x] Creating a movement updates the affected location(s)' stock balance atomically, in the same operation as recording the movement — the two are never left inconsistent with each other.
+- [x] Every movement record carries who created it and when — there is no "last updated," since movements are never edited.
 
 ## Out of scope
 

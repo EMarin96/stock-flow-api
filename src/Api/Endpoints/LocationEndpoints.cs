@@ -6,6 +6,8 @@ using StockFlow.Application.Locations.GetLocationById;
 using StockFlow.Application.Locations.GetLocations;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Application.Locations.UpdateLocation;
+using StockFlow.Application.StockMovements.GetLocationStock;
+using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Domain.Locations;
 
 namespace StockFlow.Api.Endpoints;
@@ -48,6 +50,16 @@ public static class LocationEndpoints
             .WithName("DeleteLocation")
             .WithSummary("Soft-deletes a location.")
             .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
+        // Nested under /api/locations (not StockMovementEndpoints.cs) because it's
+        // a location's product/stock listing, not a stock-movements query (see
+        // plan.md — Implementation, step 16).
+        group.MapGet("/{locationId:guid}/products", GetLocationStock)
+            .WithName("GetLocationStock")
+            .WithSummary("Lists a location's products and their current stock, paginated and optionally filtered by product name.")
+            .Produces<Application.Common.Pagination.PagedResult<LocationStockDto>>()
+            .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return app;
@@ -119,6 +131,19 @@ public static class LocationEndpoints
         var result = await mediator.Send(new DeleteLocationCommand(id), cancellationToken);
 
         return result.IsSuccess ? Results.NoContent() : result.ToProblem();
+    }
+
+    private static async Task<IResult> GetLocationStock(
+        Guid locationId,
+        IMediator mediator,
+        CancellationToken cancellationToken,
+        string? productName = null,
+        int page = 1,
+        int pageSize = 20)
+    {
+        var result = await mediator.Send(new GetLocationStockQuery(locationId, productName, page, pageSize), cancellationToken);
+
+        return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblem();
     }
 }
 

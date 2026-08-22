@@ -6,11 +6,12 @@ using StockFlow.Api.Endpoints;
 using StockFlow.Application.Common.Pagination;
 using StockFlow.Application.Products.Shared;
 using StockFlow.Domain.Products;
+using StockFlow.Tests.Api;
 
 namespace StockFlow.Tests.Api.Products;
 
 [Collection("Postgres collection")]
-public class ProductEndpointsTests : IClassFixture<ProductApiFactoryFixture>, IAsyncLifetime
+public class ProductEndpointsTests : IClassFixture<ApiFactoryFixture>, IAsyncLifetime
 {
     // Mirrors the server's JsonStringEnumConverter registration (Program.cs), so
     // the test client can round-trip the Currency enum as "USD"/"CRC" strings too.
@@ -19,10 +20,10 @@ public class ProductEndpointsTests : IClassFixture<ProductApiFactoryFixture>, IA
         Converters = { new JsonStringEnumConverter() },
     };
 
-    private readonly ProductApiFactory _factory;
+    private readonly ApiFactory _factory;
     private readonly HttpClient _client;
 
-    public ProductEndpointsTests(ProductApiFactoryFixture factoryFixture)
+    public ProductEndpointsTests(ApiFactoryFixture factoryFixture)
     {
         _factory = factoryFixture.Factory;
         _client = _factory.CreateClient();
