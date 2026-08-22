@@ -1,7 +1,8 @@
 using StockFlow.Application.Products.Shared;
 using StockFlow.Domain.Products;
+using StockFlow.Infrastructure.Persistence;
 
-namespace StockFlow.Infrastructure.Persistence.Repositories;
+namespace StockFlow.Infrastructure.Persistence.Repositories.Products;
 
 public sealed class ProductWriteRepository(StockFlowDbContext dbContext) : IProductWriteRepository
 {

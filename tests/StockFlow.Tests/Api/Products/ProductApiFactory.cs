@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StockFlow.Infrastructure.Persistence;
-using StockFlow.Infrastructure.Persistence.Read;
+using StockFlow.Infrastructure.Persistence.Dapper;
 
 namespace StockFlow.Tests.Api.Products;
 

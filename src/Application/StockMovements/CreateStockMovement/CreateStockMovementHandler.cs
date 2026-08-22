@@ -12,7 +12,7 @@ public sealed class CreateStockMovementHandler(
     IProductWriteRepository productRepository,
     ILocationWriteRepository locationRepository,
     IStockMovementWriteRepository stockMovementRepository,
-    IStockLevelRepository stockLevelRepository,
+    IStockLevelWriteRepository stockLevelRepository,
     IUnitOfWork unitOfWork,
     IValidator<CreateStockMovementCommand> validator) : IRequestHandler<CreateStockMovementCommand, Result<StockMovementDto>>
 {

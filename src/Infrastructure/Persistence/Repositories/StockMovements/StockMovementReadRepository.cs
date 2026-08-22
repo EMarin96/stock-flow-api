@@ -2,9 +2,8 @@ using Dapper;
 using StockFlow.Application.Common.Pagination;
 using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Domain.StockMovements;
-using StockFlow.Infrastructure.Persistence.Read;
 
-namespace StockFlow.Infrastructure.Persistence.Repositories;
+namespace StockFlow.Infrastructure.Persistence.Repositories.StockMovements;
 
 /// <summary>
 /// Dapper-backed read repository for stock movements. StockMovements has no

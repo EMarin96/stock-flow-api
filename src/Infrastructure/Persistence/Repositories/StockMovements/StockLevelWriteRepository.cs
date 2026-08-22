@@ -1,9 +1,10 @@
 using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Domain.StockMovements;
+using StockFlow.Infrastructure.Persistence;
 
-namespace StockFlow.Infrastructure.Persistence.Repositories;
+namespace StockFlow.Infrastructure.Persistence.Repositories.StockMovements;
 
-public sealed class StockLevelRepository(StockFlowDbContext dbContext) : IStockLevelRepository
+public sealed class StockLevelWriteRepository(StockFlowDbContext dbContext) : IStockLevelWriteRepository
 {
     /// <summary>
     /// If no row exists yet for this product+location pair, a fresh one is

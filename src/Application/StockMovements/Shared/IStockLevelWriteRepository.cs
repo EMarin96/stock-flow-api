@@ -9,7 +9,7 @@ namespace StockFlow.Application.StockMovements.Shared;
 /// mutates via Increase/Decrease within the same SaveChangesAsync as the
 /// movement insert (see plan.md — Approach).
 /// </summary>
-public interface IStockLevelRepository
+public interface IStockLevelWriteRepository
 {
     Task<StockLevel> GetOrCreateAsync(Guid productId, Guid locationId, CancellationToken cancellationToken);
 }

@@ -4,16 +4,16 @@ using StockFlow.Domain.StockMovements;
 namespace StockFlow.Tests.TestDoubles;
 
 /// <summary>
-/// In-memory stand-in for <see cref="IStockLevelRepository"/> used by handler
+/// In-memory stand-in for <see cref="IStockLevelWriteRepository"/> used by handler
 /// unit tests. To seed an existing quantity, create a <see cref="StockLevel"/>
 /// and call <see cref="StockLevel.Increase"/> before passing it in — mirrors
 /// the only way Quantity can change in production code.
 /// </summary>
-public sealed class InMemoryStockLevelRepository : IStockLevelRepository
+public sealed class InMemoryStockLevelWriteRepository : IStockLevelWriteRepository
 {
     private readonly List<StockLevel> _stockLevels;
 
-    public InMemoryStockLevelRepository(IEnumerable<StockLevel>? seed = null)
+    public InMemoryStockLevelWriteRepository(IEnumerable<StockLevel>? seed = null)
     {
         _stockLevels = seed?.ToList() ?? [];
     }

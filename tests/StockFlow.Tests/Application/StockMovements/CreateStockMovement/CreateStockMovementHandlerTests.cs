@@ -15,13 +15,13 @@ public class CreateStockMovementHandlerTests
     private static CreateStockMovementHandler HandlerWith(
         Product product,
         IEnumerable<Location> locations,
-        InMemoryStockLevelRepository? stockLevelRepository = null,
+        InMemoryStockLevelWriteRepository? stockLevelRepository = null,
         InMemoryStockMovementWriteRepository? stockMovementRepository = null) =>
         new(
             new InMemoryProductWriteRepository([product]),
             new InMemoryLocationWriteRepository(locations),
             stockMovementRepository ?? new InMemoryStockMovementWriteRepository(),
-            stockLevelRepository ?? new InMemoryStockLevelRepository(),
+            stockLevelRepository ?? new InMemoryStockLevelWriteRepository(),
             new InMemoryUnitOfWork(),
             new CreateStockMovementValidator());
 
@@ -30,7 +30,7 @@ public class CreateStockMovementHandlerTests
     {
         var product = NewProduct();
         var destination = NewLocation("WH-DEST");
-        var stockLevelRepository = new InMemoryStockLevelRepository();
+        var stockLevelRepository = new InMemoryStockLevelWriteRepository();
         var handler = HandlerWith(product, [destination], stockLevelRepository);
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.In, 10, null, destination.Id, null);
@@ -48,7 +48,7 @@ public class CreateStockMovementHandlerTests
         var source = NewLocation("WH-SRC");
         var existingStockLevel = StockLevel.Create(product.Id, source.Id);
         existingStockLevel.Increase(20);
-        var stockLevelRepository = new InMemoryStockLevelRepository([existingStockLevel]);
+        var stockLevelRepository = new InMemoryStockLevelWriteRepository([existingStockLevel]);
         var handler = HandlerWith(product, [source], stockLevelRepository);
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.Out, 15, source.Id, null, null);
@@ -66,7 +66,7 @@ public class CreateStockMovementHandlerTests
         var source = NewLocation("WH-SRC");
         var existingStockLevel = StockLevel.Create(product.Id, source.Id);
         existingStockLevel.Increase(5);
-        var handler = HandlerWith(product, [source], new InMemoryStockLevelRepository([existingStockLevel]));
+        var handler = HandlerWith(product, [source], new InMemoryStockLevelWriteRepository([existingStockLevel]));
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.Out, 10, source.Id, null, null);
         var result = await handler.Handle(command, CancellationToken.None);
@@ -98,7 +98,7 @@ public class CreateStockMovementHandlerTests
         var destination = NewLocation("WH-DEST");
         var existingStockLevel = StockLevel.Create(product.Id, source.Id);
         existingStockLevel.Increase(30);
-        var stockLevelRepository = new InMemoryStockLevelRepository([existingStockLevel]);
+        var stockLevelRepository = new InMemoryStockLevelWriteRepository([existingStockLevel]);
         var handler = HandlerWith(product, [source, destination], stockLevelRepository);
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.Transfer, 10, source.Id, destination.Id, null);
@@ -119,7 +119,7 @@ public class CreateStockMovementHandlerTests
         var destination = NewLocation("WH-DEST", Country.CR);
         var existingStockLevel = StockLevel.Create(product.Id, source.Id);
         existingStockLevel.Increase(30);
-        var handler = HandlerWith(product, [source, destination], new InMemoryStockLevelRepository([existingStockLevel]));
+        var handler = HandlerWith(product, [source, destination], new InMemoryStockLevelWriteRepository([existingStockLevel]));
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.Transfer, 10, source.Id, destination.Id, null);
         var result = await handler.Handle(command, CancellationToken.None);
@@ -134,7 +134,7 @@ public class CreateStockMovementHandlerTests
     {
         var product = NewProduct();
         var location = NewLocation();
-        var stockLevelRepository = new InMemoryStockLevelRepository();
+        var stockLevelRepository = new InMemoryStockLevelWriteRepository();
         var handler = HandlerWith(product, [location], stockLevelRepository);
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.Adjustment, 7, null, location.Id, MovementDirection.Increase);
@@ -152,7 +152,7 @@ public class CreateStockMovementHandlerTests
         var location = NewLocation();
         var existingStockLevel = StockLevel.Create(product.Id, location.Id);
         existingStockLevel.Increase(10);
-        var stockLevelRepository = new InMemoryStockLevelRepository([existingStockLevel]);
+        var stockLevelRepository = new InMemoryStockLevelWriteRepository([existingStockLevel]);
         var handler = HandlerWith(product, [location], stockLevelRepository);
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.Adjustment, 4, null, location.Id, MovementDirection.Decrease);
@@ -170,7 +170,7 @@ public class CreateStockMovementHandlerTests
         var location = NewLocation();
         var existingStockLevel = StockLevel.Create(product.Id, location.Id);
         existingStockLevel.Increase(2);
-        var handler = HandlerWith(product, [location], new InMemoryStockLevelRepository([existingStockLevel]));
+        var handler = HandlerWith(product, [location], new InMemoryStockLevelWriteRepository([existingStockLevel]));
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.Adjustment, 4, null, location.Id, MovementDirection.Decrease);
         var result = await handler.Handle(command, CancellationToken.None);

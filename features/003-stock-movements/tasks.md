@@ -4,13 +4,13 @@
 - [x] Domain: create `MovementDirection` enum (`Increase`/`Decrease`) — `src/Domain/StockMovements/MovementDirection.cs`
 - [x] Domain: create `StockMovement : Entity` with `Create(...)` guard clauses (positive quantity; per-`Type` location-field requirements; `Direction` required iff `Adjustment`) — `src/Domain/StockMovements/StockMovement.cs`
 - [x] Domain: create `StockLevel : Entity` with `Create(...)`, `Increase(...)`, `Decrease(...)` (guard clause on negative result) — `src/Domain/StockMovements/StockLevel.cs`
-- [x] Application: `Shared/` — `IStockMovementWriteRepository`, `IStockLevelRepository`, `IStockMovementReadRepository`, `IStockLevelReadRepository`, `StockMovementDto`, `LocationStockDto`, mapping extensions, `StockMovementErrors`
+- [x] Application: `Shared/` — `IStockMovementWriteRepository`, `IStockLevelWriteRepository`, `IStockMovementReadRepository`, `IStockLevelReadRepository`, `StockMovementDto`, `LocationStockDto`, mapping extensions, `StockMovementErrors`
 - [x] Application: implement `CreateStockMovement` slice (Command + Validator + Handler — product/location existence checks, cross-country transfer check, `StockLevel` mutation, insufficient-stock rejection)
 - [x] Application: implement `GetStockMovements` slice (Query + Validator + Handler — paginated, filter by product/location/type)
 - [x] Application: implement `GetLocationStock` slice (Query + Validator + Handler — paginated, filter by product name, includes zero-stock rows)
 - [x] Infrastructure: configure EF Core mapping for `StockMovement` (FKs to Products/Locations, enum conversions) — `StockMovementConfiguration.cs`
 - [x] Infrastructure: configure EF Core mapping for `StockLevel` (composite unique index, FKs, `CHECK (Quantity >= 0)` constraint) — `StockLevelConfiguration.cs`
-- [x] Infrastructure: implement `StockMovementWriteRepository` (`Add`) and `StockLevelRepository` (`GetOrCreateAsync`)
+- [x] Infrastructure: implement `StockMovementWriteRepository` (`Add`) and `StockLevelWriteRepository` (`GetOrCreateAsync`)
 - [x] Infrastructure: implement Dapper read queries for `GetStockMovements` (paginated/filtered) and `GetLocationStock` (paginated/filtered, joined to Products)
 - [x] Infrastructure: extend `IUnitOfWork`'s DB-error translation to map a `StockLevels` check-constraint violation to `StockMovementErrors.InsufficientStock`
 - [x] Infrastructure: create and apply EF Core migration `AddStockMovementsAndStockLevelsTables`
