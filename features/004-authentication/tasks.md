@@ -1,0 +1,37 @@
+# 004 · Authentication and user roles — Tasks
+
+- [ ] Domain: create `Role` enum (`Admin`/`Operator`/`ReadOnly`) — `src/Domain/Users/Role.cs`
+- [ ] Domain: create `User : AuditableEntity` with `Username`/`NormalizedUsername`/`PasswordHash`/`Role`, `Create(...)` guard clauses, `UpdateRole(...)`, `ResetPassword(...)` — `src/Domain/Users/User.cs`
+- [ ] Domain: add `Guid? createdBy`/`updatedBy` parameters to `Product.Create`/`Update`, `Location.Create`/`Update`, `StockMovement.Create`
+- [ ] Application: add `ErrorType.Unauthorized` + `Error.Unauthorized(...)` factory — `Common/Results/Error.cs`
+- [ ] Application: `Common/Security/` — `IPasswordHasher`, `IJwtTokenGenerator`, `ICurrentUserService`
+- [ ] Application: `Users/Shared/` — `IUserWriteRepository`, `IUserReadRepository`, `UserDto`, `AuthenticationRecord`, `UserErrors`, mapping extensions
+- [ ] Application: implement `CreateUser` slice (Command + Validator + Handler — username uniqueness pre-check + DB-race backstop, password hashing)
+- [ ] Application: implement `GetUsers` slice (Query + Validator + Handler — paginated, filter by username/role)
+- [ ] Application: implement `GetUserById` slice
+- [ ] Application: implement `UpdateUser` slice (Command + Validator + Handler — role change, optional password reset)
+- [ ] Application: implement `DeactivateUser` slice (Command + Validator + Handler — soft delete, rejects self-deactivation)
+- [ ] Application: implement `Auth/Login` slice (Command + Validator + Handler — generic invalid-credentials error for unknown/wrong-password/deactivated)
+- [ ] Application: retrofit `ICurrentUserService` into `CreateProductHandler`/`UpdateProductHandler`/`CreateLocationHandler`/`UpdateLocationHandler`/`CreateStockMovementHandler` to populate `CreatedBy`/`UpdatedBy`
+- [ ] Infrastructure: `PasswordHasher` (PBKDF2, constant-time verify) — `Security/PasswordHasher.cs`
+- [ ] Infrastructure: `JwtOptions` (Options Pattern) + `JwtTokenGenerator` — `Security/JwtOptions.cs`, `Security/JwtTokenGenerator.cs`
+- [ ] Infrastructure: configure EF Core mapping for `User` (unique index on `NormalizedUsername`, soft-delete query filter) — `UserConfiguration.cs`
+- [ ] Infrastructure: implement `UserWriteRepository` (EF) and `UserReadRepository` (Dapper, including `GetForAuthenticationAsync`)
+- [ ] Infrastructure: register new services/repositories/options in `DependencyInjection.cs`
+- [ ] Infrastructure: create and apply EF Core migration `AddUsersTable`
+- [ ] Api: `Security/CurrentUserService.cs` (implements `ICurrentUserService` via `IHttpContextAccessor`)
+- [ ] Api: implement `POST /api/auth/login` (anonymous) — `src/Api/Endpoints/AuthEndpoints.cs`
+- [ ] Api: implement Users CRUD (`POST`/`GET`/`GET` list/`PUT`/`DELETE`, all Admin-only) — `src/Api/Endpoints/UserEndpoints.cs`
+- [ ] Api: wire JWT authentication (`AddAuthentication().AddJwtBearer(...)`) and authorization (`FallbackPolicy`, `WriteAccess`/`AdminOnly` policies) in `Program.cs`
+- [ ] Api: add the startup admin-bootstrap block (seed from `Seed:AdminUsername`/`AdminPassword`, fail-fast if missing while `Users` is empty)
+- [ ] Api: retrofit `.RequireAuthorization("WriteAccess")`/`"AdminOnly"` onto existing Products/Locations/StockMovements POST/PUT/DELETE routes
+- [ ] Api: add Swagger JWT bearer support (`AddSecurityDefinition`/`AddSecurityRequirement`) and annotations for the new endpoints
+- [ ] Configuration: add `Jwt`/`Seed` sections (empty placeholders) to `appsettings.Development.json`
+- [ ] Tests: unit tests for `User.Create`/`UpdateRole`/`ResetPassword` guard clauses
+- [ ] Tests: unit tests for `PasswordHasher` (round-trip, wrong-password rejection) and `JwtTokenGenerator` (claim contents)
+- [ ] Tests: unit tests for each Users/Auth handler and validator, including `CannotDeactivateSelf` and the generic invalid-credentials path
+- [ ] Tests: extend `ApiFactory`/`ApiFactoryFixture` with a way to obtain a bearer token per role
+- [ ] Tests: update every existing Products/Locations/StockMovements integration test to use an authorized `HttpClient`
+- [ ] Tests: integration tests for Users/Auth endpoints, plus explicit 401 (no/invalid token) and 403 (wrong role) cases per endpoint group
+- [ ] Validate against the acceptance criteria in `spec.md`
+- [ ] Move the feature to "Done" in `constitution/roadmap.md` (left for verification, per SDD process)
