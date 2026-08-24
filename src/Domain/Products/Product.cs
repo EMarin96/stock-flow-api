@@ -31,7 +31,8 @@ public class Product : AuditableEntity
         string? description,
         string unitOfMeasure,
         Money price,
-        int minimumStockThreshold)
+        int minimumStockThreshold,
+        Guid? createdBy)
     {
         Id = Guid.NewGuid();
         Sku = sku;
@@ -41,6 +42,7 @@ public class Product : AuditableEntity
         Price = price;
         MinimumStockThreshold = minimumStockThreshold;
         CreatedAt = DateTime.UtcNow;
+        CreatedBy = createdBy;
     }
 
     public static Product Create(
@@ -50,9 +52,10 @@ public class Product : AuditableEntity
         string unitOfMeasure,
         decimal price,
         Currency currency,
-        int minimumStockThreshold)
+        int minimumStockThreshold,
+        Guid? createdBy = null)
     {
-        return new Product(Sku.Create(sku), name, description, unitOfMeasure, Money.Create(price, currency), minimumStockThreshold);
+        return new Product(Sku.Create(sku), name, description, unitOfMeasure, Money.Create(price, currency), minimumStockThreshold, createdBy);
     }
 
     /// <summary>
@@ -64,7 +67,8 @@ public class Product : AuditableEntity
         string unitOfMeasure,
         decimal price,
         Currency currency,
-        int minimumStockThreshold)
+        int minimumStockThreshold,
+        Guid? updatedBy = null)
     {
         Name = name;
         Description = description;
@@ -72,6 +76,7 @@ public class Product : AuditableEntity
         Price = Money.Create(price, currency);
         MinimumStockThreshold = minimumStockThreshold;
         UpdatedAt = DateTime.UtcNow;
+        UpdatedBy = updatedBy;
     }
 
     public void SoftDelete()

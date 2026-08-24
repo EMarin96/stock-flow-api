@@ -10,6 +10,7 @@ using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Domain.Locations;
 using StockFlow.Domain.Products;
 using StockFlow.Domain.StockMovements;
+using StockFlow.Domain.Users;
 using StockFlow.Tests.Api;
 
 namespace StockFlow.Tests.Api.StockMovements;
@@ -31,7 +32,7 @@ public class StockMovementEndpointsTests : IClassFixture<ApiFactoryFixture>, IAs
     public StockMovementEndpointsTests(ApiFactoryFixture factoryFixture)
     {
         _factory = factoryFixture.Factory;
-        _client = _factory.CreateClient();
+        _client = _factory.CreateAuthorizedClient(Role.Admin);
     }
 
     public Task InitializeAsync() => _factory.ResetDatabaseAsync();

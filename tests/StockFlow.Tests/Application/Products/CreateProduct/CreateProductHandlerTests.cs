@@ -18,7 +18,7 @@ public class CreateProductHandlerTests
     public async Task CreateProduct_WhenCommandIsValidAndSkuIsUnique_CreatesProduct()
     {
         var repository = new InMemoryProductWriteRepository();
-        var handler = new CreateProductHandler(repository, new InMemoryUnitOfWork(), new CreateProductValidator());
+        var handler = new CreateProductHandler(repository, new InMemoryCurrentUserService(), new InMemoryUnitOfWork(), new CreateProductValidator());
 
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
@@ -27,11 +27,24 @@ public class CreateProductHandlerTests
     }
 
     [Fact]
+    public async Task CreateProduct_SetsCreatedByToTheAuthenticatedUser()
+    {
+        var repository = new InMemoryProductWriteRepository();
+        var actingUserId = Guid.NewGuid();
+        var handler = new CreateProductHandler(repository, new InMemoryCurrentUserService(actingUserId), new InMemoryUnitOfWork(), new CreateProductValidator());
+
+        var result = await handler.Handle(ValidCommand(), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(actingUserId, result.Value.CreatedBy);
+    }
+
+    [Fact]
     public async Task CreateProduct_WhenSkuAlreadyExists_ReturnsConflict()
     {
         var existingProduct = StockFlow.Domain.Products.Product.Create("SKU-100", "Existing", null, "unit", 1m, Currency.USD, 0);
         var repository = new InMemoryProductWriteRepository([existingProduct]);
-        var handler = new CreateProductHandler(repository, new InMemoryUnitOfWork(), new CreateProductValidator());
+        var handler = new CreateProductHandler(repository, new InMemoryCurrentUserService(), new InMemoryUnitOfWork(), new CreateProductValidator());
 
         var result = await handler.Handle(ValidCommand(), CancellationToken.None);
 
@@ -43,7 +56,7 @@ public class CreateProductHandlerTests
     public async Task CreateProduct_WhenCommandIsInvalid_ReturnsValidationError()
     {
         var repository = new InMemoryProductWriteRepository();
-        var handler = new CreateProductHandler(repository, new InMemoryUnitOfWork(), new CreateProductValidator());
+        var handler = new CreateProductHandler(repository, new InMemoryCurrentUserService(), new InMemoryUnitOfWork(), new CreateProductValidator());
 
         var result = await handler.Handle(ValidCommand() with { Price = -5m }, CancellationToken.None);
 

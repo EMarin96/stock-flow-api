@@ -6,6 +6,7 @@ using StockFlow.Api.Endpoints;
 using StockFlow.Application.Common.Pagination;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Domain.Locations;
+using StockFlow.Domain.Users;
 using StockFlow.Tests.Api;
 
 namespace StockFlow.Tests.Api.Locations;
@@ -26,7 +27,7 @@ public class LocationEndpointsTests : IClassFixture<ApiFactoryFixture>, IAsyncLi
     public LocationEndpointsTests(ApiFactoryFixture factoryFixture)
     {
         _factory = factoryFixture.Factory;
-        _client = _factory.CreateClient();
+        _client = _factory.CreateAuthorizedClient(Role.Admin);
     }
 
     public Task InitializeAsync() => _factory.ResetDatabaseAsync();

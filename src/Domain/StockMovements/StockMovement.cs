@@ -48,7 +48,8 @@ public class StockMovement : Entity
         int quantity,
         Guid? sourceLocationId,
         Guid? destinationLocationId,
-        MovementDirection? direction)
+        MovementDirection? direction,
+        Guid? createdBy)
     {
         Id = Guid.NewGuid();
         ProductId = productId;
@@ -58,6 +59,7 @@ public class StockMovement : Entity
         DestinationLocationId = destinationLocationId;
         Direction = direction;
         CreatedAt = DateTime.UtcNow;
+        CreatedBy = createdBy;
     }
 
     /// <summary>
@@ -75,7 +77,8 @@ public class StockMovement : Entity
         int quantity,
         Guid? sourceLocationId,
         Guid? destinationLocationId,
-        MovementDirection? direction)
+        MovementDirection? direction,
+        Guid? createdBy = null)
     {
         if (quantity <= 0)
         {
@@ -145,6 +148,6 @@ public class StockMovement : Entity
             throw new DomainValidationException("Direction is only allowed for an 'Adjustment' movement.");
         }
 
-        return new StockMovement(productId, type, quantity, sourceLocationId, destinationLocationId, direction);
+        return new StockMovement(productId, type, quantity, sourceLocationId, destinationLocationId, direction, createdBy);
     }
 }

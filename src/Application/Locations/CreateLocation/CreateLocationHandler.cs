@@ -1,4 +1,5 @@
 using StockFlow.Application.Common.Exceptions;
+using StockFlow.Application.Common.Security;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Domain.Locations;
 
@@ -7,6 +8,7 @@ namespace StockFlow.Application.Locations.CreateLocation;
 public sealed class CreateLocationHandler(
     ILocationWriteRepository repository,
     ICountryReferenceDataService referenceDataService,
+    ICurrentUserService currentUserService,
     IUnitOfWork unitOfWork,
     IValidator<CreateLocationCommand> validator) : IRequestHandler<CreateLocationCommand, Result<LocationDto>>
 {
@@ -50,7 +52,8 @@ public sealed class CreateLocationHandler(
             request.AddressLine3,
             request.State,
             request.City,
-            request.Country);
+            request.Country,
+            currentUserService.UserId);
 
         try
         {

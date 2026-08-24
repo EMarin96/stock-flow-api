@@ -1,3 +1,4 @@
+using StockFlow.Application.Common.Security;
 using StockFlow.Application.Locations.Shared;
 
 namespace StockFlow.Application.Locations.UpdateLocation;
@@ -5,6 +6,7 @@ namespace StockFlow.Application.Locations.UpdateLocation;
 public sealed class UpdateLocationHandler(
     ILocationWriteRepository repository,
     ICountryReferenceDataService referenceDataService,
+    ICurrentUserService currentUserService,
     IUnitOfWork unitOfWork,
     IValidator<UpdateLocationCommand> validator) : IRequestHandler<UpdateLocationCommand, Result<LocationDto>>
 {
@@ -44,7 +46,8 @@ public sealed class UpdateLocationHandler(
             request.AddressLine3,
             request.State,
             request.City,
-            request.Country);
+            request.Country,
+            currentUserService.UserId);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

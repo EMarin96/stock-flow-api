@@ -19,7 +19,8 @@ public static class StockMovementEndpoints
             .Produces<StockMovementDto>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status409Conflict);
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .RequireAuthorization("WriteAccess");
 
         group.MapGet("/", GetStockMovements)
             .WithName("GetStockMovements")

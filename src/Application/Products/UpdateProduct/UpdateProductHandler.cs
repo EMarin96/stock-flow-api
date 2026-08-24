@@ -1,9 +1,11 @@
+using StockFlow.Application.Common.Security;
 using StockFlow.Application.Products.Shared;
 
 namespace StockFlow.Application.Products.UpdateProduct;
 
 public sealed class UpdateProductHandler(
     IProductWriteRepository repository,
+    ICurrentUserService currentUserService,
     IUnitOfWork unitOfWork,
     IValidator<UpdateProductCommand> validator) : IRequestHandler<UpdateProductCommand, Result<ProductDto>>
 {
@@ -27,7 +29,8 @@ public sealed class UpdateProductHandler(
             request.UnitOfMeasure,
             request.Price,
             request.Currency,
-            request.MinimumStockThreshold);
+            request.MinimumStockThreshold,
+            currentUserService.UserId);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
