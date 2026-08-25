@@ -1,4 +1,5 @@
 using StockFlow.Api.Common;
+using StockFlow.Api.Security;
 using StockFlow.Application.Common.Mediator;
 using StockFlow.Application.Users.CreateUser;
 using StockFlow.Application.Users.DeactivateUser;
@@ -14,9 +15,9 @@ public static class UserEndpoints
 {
     public static IEndpointRouteBuilder MapUserEndpoints(this IEndpointRouteBuilder app)
     {
-        // Every route requires the "AdminOnly" policy — user management is
+        // Every route requires the AdminOnly policy — user management is
         // Admin-only, per spec.md's role table.
-        var group = app.MapGroup("/api/users").WithTags("Users").RequireAuthorization("AdminOnly");
+        var group = app.MapGroup("/api/users").WithTags("Users").RequireAuthorization(nameof(AuthorizationPolicy.AdminOnly));
 
         group.MapPost("/", CreateUser)
             .WithName("CreateUser")

@@ -1,4 +1,5 @@
 using StockFlow.Api.Common;
+using StockFlow.Api.Security;
 using StockFlow.Application.Common.Mediator;
 using StockFlow.Application.Locations.CreateLocation;
 using StockFlow.Application.Locations.DeleteLocation;
@@ -25,7 +26,7 @@ public static class LocationEndpoints
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesProblem(StatusCodes.Status503ServiceUnavailable)
-            .RequireAuthorization("WriteAccess");
+            .RequireAuthorization(nameof(AuthorizationPolicy.WriteAccess));
 
         group.MapGet("/{id:guid}", GetLocationById)
             .WithName("GetLocationById")
@@ -46,14 +47,14 @@ public static class LocationEndpoints
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status503ServiceUnavailable)
-            .RequireAuthorization("WriteAccess");
+            .RequireAuthorization(nameof(AuthorizationPolicy.WriteAccess));
 
         group.MapDelete("/{id:guid}", DeleteLocation)
             .WithName("DeleteLocation")
             .WithSummary("Soft-deletes a location.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAuthorization("AdminOnly");
+            .RequireAuthorization(nameof(AuthorizationPolicy.AdminOnly));
 
         // Nested under /api/locations (not StockMovementEndpoints.cs) because it's
         // a location's product/stock listing, not a stock-movements query (see

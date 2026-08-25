@@ -1,4 +1,5 @@
 using StockFlow.Api.Common;
+using StockFlow.Api.Security;
 using StockFlow.Application.Common.Mediator;
 using StockFlow.Application.StockMovements.CreateStockMovement;
 using StockFlow.Application.StockMovements.GetStockMovements;
@@ -20,7 +21,7 @@ public static class StockMovementEndpoints
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict)
-            .RequireAuthorization("WriteAccess");
+            .RequireAuthorization(nameof(AuthorizationPolicy.WriteAccess));
 
         group.MapGet("/", GetStockMovements)
             .WithName("GetStockMovements")

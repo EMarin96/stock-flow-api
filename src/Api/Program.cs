@@ -72,8 +72,8 @@ builder.Services.AddAuthorization(options =>
         .RequireAuthenticatedUser()
         .Build();
 
-    options.AddPolicy("WriteAccess", policy => policy.RequireRole(nameof(Role.Admin), nameof(Role.Operator)));
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole(nameof(Role.Admin)));
+    options.AddPolicy(nameof(AuthorizationPolicy.WriteAccess), policy => policy.RequireRole(nameof(Role.Admin), nameof(Role.Operator)));
+    options.AddPolicy(nameof(AuthorizationPolicy.AdminOnly), policy => policy.RequireRole(nameof(Role.Admin)));
 });
 
 // Address State/City reference-data lookups (see plan.md — Implementation):
