@@ -30,14 +30,18 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
+// Registered before UseAuthentication/UseAuthorization so /swagger/* is served
+// by Swashbuckle's own middleware branch without ever reaching the global
+// FallbackPolicy (RequireAuthenticatedUser) — otherwise every Swagger request
+// gets rejected before the pipeline reaches it.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 await app.ApplyPendingMigrationsAsync();
 await app.SeedInitialAdminUserAsync();
