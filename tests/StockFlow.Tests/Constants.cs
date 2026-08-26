@@ -9,5 +9,5 @@ namespace StockFlow.Tests;
 public static class TestDatabase
 {
     public const string TruncateAllTablesSql =
-        """TRUNCATE TABLE "StockMovements", "StockLevels", "Locations", "Products";""";
+        """TRUNCATE TABLE "StockMovements", "StockLevels", "Locations", "Products", "Users";""";
 }

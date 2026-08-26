@@ -1,4 +1,5 @@
 using StockFlow.Application.Common.Exceptions;
+using StockFlow.Application.Common.Security;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Application.Products.Shared;
 using StockFlow.Application.StockMovements.Shared;
@@ -13,6 +14,7 @@ public sealed class CreateStockMovementHandler(
     ILocationWriteRepository locationRepository,
     IStockMovementWriteRepository stockMovementRepository,
     IStockLevelWriteRepository stockLevelRepository,
+    ICurrentUserService currentUserService,
     IUnitOfWork unitOfWork,
     IValidator<CreateStockMovementCommand> validator) : IRequestHandler<CreateStockMovementCommand, Result<StockMovementDto>>
 {
@@ -99,7 +101,8 @@ public sealed class CreateStockMovementHandler(
             request.Quantity,
             request.SourceLocationId,
             request.DestinationLocationId,
-            request.Direction);
+            request.Direction,
+            currentUserService.UserId);
 
         try
         {

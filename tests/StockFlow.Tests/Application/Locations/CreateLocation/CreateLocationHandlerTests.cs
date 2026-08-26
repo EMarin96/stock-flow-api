@@ -18,10 +18,12 @@ public class CreateLocationHandlerTests
 
     private static CreateLocationHandler HandlerWith(
         InMemoryLocationWriteRepository? repository = null,
-        ICountryReferenceDataService? referenceDataService = null) =>
+        ICountryReferenceDataService? referenceDataService = null,
+        InMemoryCurrentUserService? currentUserService = null) =>
         new(
             repository ?? new InMemoryLocationWriteRepository(),
             referenceDataService ?? new InMemoryCountryReferenceDataService(),
+            currentUserService ?? new InMemoryCurrentUserService(),
             new InMemoryUnitOfWork(),
             new CreateLocationValidator());
 
@@ -35,6 +37,18 @@ public class CreateLocationHandlerTests
         Assert.True(result.IsSuccess);
         Assert.Equal("WH-100", result.Value.Code);
         Assert.Equal("Los Angeles", result.Value.City);
+    }
+
+    [Fact]
+    public async Task CreateLocation_SetsCreatedByToTheAuthenticatedUser()
+    {
+        var actingUserId = Guid.NewGuid();
+        var handler = HandlerWith(currentUserService: new InMemoryCurrentUserService(actingUserId));
+
+        var result = await handler.Handle(ValidCommand(), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(actingUserId, result.Value.CreatedBy);
     }
 
     [Fact]

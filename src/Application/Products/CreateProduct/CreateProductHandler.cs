@@ -1,4 +1,5 @@
 using StockFlow.Application.Common.Exceptions;
+using StockFlow.Application.Common.Security;
 using StockFlow.Application.Products.Shared;
 using StockFlow.Domain.Products;
 
@@ -6,6 +7,7 @@ namespace StockFlow.Application.Products.CreateProduct;
 
 public sealed class CreateProductHandler(
     IProductWriteRepository repository,
+    ICurrentUserService currentUserService,
     IUnitOfWork unitOfWork,
     IValidator<CreateProductCommand> validator) : IRequestHandler<CreateProductCommand, Result<ProductDto>>
 {
@@ -33,7 +35,8 @@ public sealed class CreateProductHandler(
             request.UnitOfMeasure,
             request.Price,
             request.Currency,
-            request.MinimumStockThreshold);
+            request.MinimumStockThreshold,
+            currentUserService.UserId);
 
         try
         {

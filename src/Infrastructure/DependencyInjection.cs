@@ -1,14 +1,18 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StockFlow.Application.Common.Persistence;
+using StockFlow.Application.Common.Security;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Application.Products.Shared;
 using StockFlow.Application.StockMovements.Shared;
+using StockFlow.Application.Users.Shared;
 using StockFlow.Infrastructure.ExternalServices.CountryStateCity;
 using StockFlow.Infrastructure.Persistence;
 using StockFlow.Infrastructure.Persistence.Repositories.Locations;
 using StockFlow.Infrastructure.Persistence.Repositories.Products;
 using StockFlow.Infrastructure.Persistence.Repositories.StockMovements;
+using StockFlow.Infrastructure.Persistence.Repositories.Users;
+using StockFlow.Infrastructure.Security;
 
 namespace StockFlow.Infrastructure;
 
@@ -31,7 +35,17 @@ public static class DependencyInjection
         services.AddScoped<IStockMovementReadRepository, StockMovementReadRepository>();
         services.AddScoped<IStockLevelWriteRepository, StockLevelWriteRepository>();
         services.AddScoped<IStockLevelReadRepository, StockLevelReadRepository>();
+        services.AddScoped<IUserWriteRepository, UserWriteRepository>();
+        services.AddScoped<IUserReadRepository, UserReadRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        // JwtOptions is configured in Program.cs (not here), since it is also
+        // needed there to build TokenValidationParameters for AddJwtBearer —
+        // same reasoning already documented for CountryStateCityOptions (see
+        // plan.md — Implementation, step 24).
 
         // CountryStateCityApiClient (typed HttpClient), IMemoryCache, and the
         // states-cache warm-up hosted service are registered in Program.cs, since

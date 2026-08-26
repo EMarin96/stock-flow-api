@@ -1,4 +1,5 @@
 using StockFlow.Api.Common;
+using StockFlow.Api.Security;
 using StockFlow.Application.Common.Mediator;
 using StockFlow.Application.Products.CreateProduct;
 using StockFlow.Application.Products.DeleteProduct;
@@ -21,7 +22,8 @@ public static class ProductEndpoints
             .WithSummary("Creates a new product.")
             .Produces<ProductDto>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
-            .ProducesProblem(StatusCodes.Status409Conflict);
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .RequireAuthorization(nameof(AuthorizationPolicy.WriteAccess));
 
         group.MapGet("/{id:guid}", GetProductById)
             .WithName("GetProductById")
@@ -40,13 +42,15 @@ public static class ProductEndpoints
             .WithSummary("Updates an existing product. The SKU is not editable.")
             .Produces<ProductDto>()
             .ProducesValidationProblem()
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization(nameof(AuthorizationPolicy.WriteAccess));
 
         group.MapDelete("/{id:guid}", DeleteProduct)
             .WithName("DeleteProduct")
             .WithSummary("Soft-deletes a product.")
             .Produces(StatusCodes.Status204NoContent)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization(nameof(AuthorizationPolicy.AdminOnly));
 
         return app;
     }

@@ -25,13 +25,14 @@ public class Location : AuditableEntity
     {
     }
 
-    private Location(LocationCode code, string name, Address address)
+    private Location(LocationCode code, string name, Address address, Guid? createdBy)
     {
         Id = Guid.NewGuid();
         Code = code;
         Name = name;
         Address = address;
         CreatedAt = DateTime.UtcNow;
+        CreatedBy = createdBy;
     }
 
     public static Location Create(
@@ -42,12 +43,14 @@ public class Location : AuditableEntity
         string? addressLine3,
         string state,
         string city,
-        Country country)
+        Country country,
+        Guid? createdBy = null)
     {
         return new Location(
             LocationCode.Create(code),
             name,
-            Address.Create(addressLine1, addressLine2, addressLine3, state, city, country));
+            Address.Create(addressLine1, addressLine2, addressLine3, state, city, country),
+            createdBy);
     }
 
     /// <summary>
@@ -61,11 +64,13 @@ public class Location : AuditableEntity
         string? addressLine3,
         string state,
         string city,
-        Country country)
+        Country country,
+        Guid? updatedBy = null)
     {
         Name = name;
         Address = Address.Create(addressLine1, addressLine2, addressLine3, state, city, country);
         UpdatedAt = DateTime.UtcNow;
+        UpdatedBy = updatedBy;
     }
 
     public void SoftDelete()

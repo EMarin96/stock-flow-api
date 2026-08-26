@@ -12,6 +12,7 @@ public class UpdateLocationHandlerTests
         new(
             repository,
             referenceDataService ?? new InMemoryCountryReferenceDataService(),
+            new InMemoryCurrentUserService(),
             new InMemoryUnitOfWork(),
             new UpdateLocationValidator());
 

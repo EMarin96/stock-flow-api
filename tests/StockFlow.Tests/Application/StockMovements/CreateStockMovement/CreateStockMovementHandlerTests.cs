@@ -16,12 +16,14 @@ public class CreateStockMovementHandlerTests
         Product product,
         IEnumerable<Location> locations,
         InMemoryStockLevelWriteRepository? stockLevelRepository = null,
-        InMemoryStockMovementWriteRepository? stockMovementRepository = null) =>
+        InMemoryStockMovementWriteRepository? stockMovementRepository = null,
+        InMemoryCurrentUserService? currentUserService = null) =>
         new(
             new InMemoryProductWriteRepository([product]),
             new InMemoryLocationWriteRepository(locations),
             stockMovementRepository ?? new InMemoryStockMovementWriteRepository(),
             stockLevelRepository ?? new InMemoryStockLevelWriteRepository(),
+            currentUserService ?? new InMemoryCurrentUserService(),
             new InMemoryUnitOfWork(),
             new CreateStockMovementValidator());
 
@@ -239,17 +241,18 @@ public class CreateStockMovementHandlerTests
     }
 
     [Fact]
-    public async Task CreateStockMovement_WhenSuccessful_ReturnsMovementCarryingCreatedAtAndNoUpdatedFields()
+    public async Task CreateStockMovement_WhenSuccessful_ReturnsMovementCarryingCreatedAtAndCreatedByFromTheCurrentUser()
     {
         var product = NewProduct();
         var destination = NewLocation();
-        var handler = HandlerWith(product, [destination]);
+        var actingUserId = Guid.NewGuid();
+        var handler = HandlerWith(product, [destination], currentUserService: new InMemoryCurrentUserService(actingUserId));
 
         var command = new CreateStockMovementCommand(product.Id, MovementType.In, 10, null, destination.Id, null);
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.True(result.IsSuccess);
         Assert.True(result.Value.CreatedAt <= DateTime.UtcNow);
-        Assert.Null(result.Value.CreatedBy);
+        Assert.Equal(actingUserId, result.Value.CreatedBy);
     }
 }

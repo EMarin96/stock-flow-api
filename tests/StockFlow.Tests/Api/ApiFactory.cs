@@ -1,10 +1,14 @@
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using StockFlow.Application.Common.Security;
 using StockFlow.Application.Locations.Shared;
+using StockFlow.Domain.Users;
 using StockFlow.Infrastructure.Persistence;
 using StockFlow.Infrastructure.Persistence.Dapper;
 using StockFlow.Tests;
@@ -30,6 +34,25 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Deterministic test-only Jwt/Seed configuration — the startup
+        // admin-bootstrap block (Program.cs) and JWT validation run
+        // unconditionally, so tests must never depend on user-secrets/env vars
+        // that may or may not be present on a given machine/CI runner (see
+        // tasks.md — "extend ApiFactory/ApiFactoryFixture with a way to obtain
+        // a bearer token per role").
+        builder.ConfigureAppConfiguration((_, configurationBuilder) =>
+        {
+            configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:Secret"] = "test-only-signing-key-do-not-use-in-production-environments-32+chars",
+                ["Jwt:Issuer"] = "StockFlowApi",
+                ["Jwt:Audience"] = "StockFlowApi",
+                ["Jwt:ExpiryMinutes"] = "480",
+                ["Seed:AdminUsername"] = "seed-admin",
+                ["Seed:AdminPassword"] = "Seed-Admin-Password-1!",
+            });
+        });
+
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<DbContextOptions<StockFlowDbContext>>();
@@ -75,5 +98,34 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
         using var scope = Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<StockFlowDbContext>();
         await dbContext.Database.ExecuteSqlRawAsync(TestDatabase.TruncateAllTablesSql);
+    }
+
+    /// <summary>
+    /// Mints a JWT directly via the test host's <see cref="IJwtTokenGenerator"/>
+    /// DI registration, rather than seeding a real user and calling
+    /// POST /api/auth/login (see tasks.md — "extend ApiFactory/ApiFactoryFixture
+    /// with a way to obtain a bearer token per role"). Valid because JWT
+    /// validation is purely signature/claims-based — it never looks the user
+    /// up in the database — so the subject id doesn't need to correspond to an
+    /// existing row.
+    /// </summary>
+    public string CreateToken(Role role, Guid? userId = null, string? username = null)
+    {
+        using var scope = Services.CreateScope();
+        var jwtTokenGenerator = scope.ServiceProvider.GetRequiredService<IJwtTokenGenerator>();
+        var (token, _) = jwtTokenGenerator.GenerateToken(userId ?? Guid.NewGuid(), username ?? $"test-{role}".ToLowerInvariant(), role);
+        return token;
+    }
+
+    /// <summary>
+    /// An <see cref="HttpClient"/> pre-configured with a bearer token for the
+    /// given role — the standard way test classes exercise authorized
+    /// requests.
+    /// </summary>
+    public HttpClient CreateAuthorizedClient(Role role, Guid? userId = null, string? username = null)
+    {
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CreateToken(role, userId, username));
+        return client;
     }
 }

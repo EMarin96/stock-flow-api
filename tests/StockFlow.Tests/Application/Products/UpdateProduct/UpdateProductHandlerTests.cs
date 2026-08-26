@@ -10,7 +10,7 @@ public class UpdateProductHandlerTests
     {
         var product = Product.Create("SKU-100", "Widget", null, "unit", 10m, Currency.USD, 5);
         var repository = new InMemoryProductWriteRepository([product]);
-        var handler = new UpdateProductHandler(repository, new InMemoryUnitOfWork(), new UpdateProductValidator());
+        var handler = new UpdateProductHandler(repository, new InMemoryCurrentUserService(), new InMemoryUnitOfWork(), new UpdateProductValidator());
 
         var command = new UpdateProductCommand(product.Id, "Widget v2", "Updated", "box", 20m, Currency.CRC, 10);
         var result = await handler.Handle(command, CancellationToken.None);
@@ -22,10 +22,25 @@ public class UpdateProductHandlerTests
     }
 
     [Fact]
+    public async Task UpdateProduct_SetsUpdatedByToTheAuthenticatedUser()
+    {
+        var product = Product.Create("SKU-100", "Widget", null, "unit", 10m, Currency.USD, 5);
+        var repository = new InMemoryProductWriteRepository([product]);
+        var actingUserId = Guid.NewGuid();
+        var handler = new UpdateProductHandler(repository, new InMemoryCurrentUserService(actingUserId), new InMemoryUnitOfWork(), new UpdateProductValidator());
+
+        var command = new UpdateProductCommand(product.Id, "Widget v2", "Updated", "box", 20m, Currency.CRC, 10);
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(actingUserId, result.Value.UpdatedBy);
+    }
+
+    [Fact]
     public async Task UpdateProduct_WhenProductDoesNotExist_ReturnsNotFound()
     {
         var repository = new InMemoryProductWriteRepository();
-        var handler = new UpdateProductHandler(repository, new InMemoryUnitOfWork(), new UpdateProductValidator());
+        var handler = new UpdateProductHandler(repository, new InMemoryCurrentUserService(), new InMemoryUnitOfWork(), new UpdateProductValidator());
 
         var command = new UpdateProductCommand(Guid.NewGuid(), "Widget", null, "unit", 10m, Currency.USD, 5);
         var result = await handler.Handle(command, CancellationToken.None);
@@ -40,7 +55,7 @@ public class UpdateProductHandlerTests
         var product = Product.Create("SKU-100", "Widget", null, "unit", 10m, Currency.USD, 5);
         product.SoftDelete();
         var repository = new InMemoryProductWriteRepository([product]);
-        var handler = new UpdateProductHandler(repository, new InMemoryUnitOfWork(), new UpdateProductValidator());
+        var handler = new UpdateProductHandler(repository, new InMemoryCurrentUserService(), new InMemoryUnitOfWork(), new UpdateProductValidator());
 
         var command = new UpdateProductCommand(product.Id, "Widget", null, "unit", 10m, Currency.USD, 5);
         var result = await handler.Handle(command, CancellationToken.None);
