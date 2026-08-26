@@ -32,10 +32,10 @@ public static class SwaggerServiceCollectionExtensions
                 In = Microsoft.OpenApi.ParameterLocation.Header,
                 Description = "Enter the JWT returned by POST /api/auth/login.",
             });
-            options.AddSecurityRequirement(_ => new Microsoft.OpenApi.OpenApiSecurityRequirement
+            options.AddSecurityRequirement(document => new Microsoft.OpenApi.OpenApiSecurityRequirement
             {
                 {
-                    new Microsoft.OpenApi.OpenApiSecuritySchemeReference(bearerSecurityScheme, null),
+                    new Microsoft.OpenApi.OpenApiSecuritySchemeReference(bearerSecurityScheme, document),
                     new List<string>()
                 },
             });
