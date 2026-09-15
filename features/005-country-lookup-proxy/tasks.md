@@ -12,7 +12,7 @@ _Actionable checklist derived from `plan.md`. Small, concrete tasks; mark `[x]` 
 - [x] Wire `app.MapCountryEndpoints();` into `Program.cs`.
 - [x] Unit tests: `GetCountriesHandlerTests`, `GetStatesHandlerTests`, `GetCitiesHandlerTests` (valid path, invalid country code, invalid state, reference-data-unavailable).
 - [x] Integration tests: `tests/StockFlow.Tests/Api/Countries/CountryEndpointsTests.cs` (200s, 400s for bad codes, 401 with no token, 200 with a ReadOnly-role token).
-- [ ] Run `dotnet format` and `dotnet build`. **Not run** — no .NET SDK or Docker daemon available in this session's sandbox; code was hand-verified against shipped, identically-shaped code (e.g. `AddressReferenceDataValidator`) but needs a real build before merging.
-- [ ] Run `dotnet test` — full suite green. **Not run**, same reason as above.
-- [ ] Validate against the acceptance criteria in `spec.md`.
-- [ ] Move the feature to "Done" in `../../constitution/roadmap.md` and remove the corresponding bullet from "Backlog / ideas".
+- [x] Run `dotnet format` and `dotnet build`. Verified via PR #8's `build-and-test` CI check (restore, build, `dotnet format --verify-no-changes`) — all green.
+- [x] Run `dotnet test` — full suite green. Verified via the same CI check (`dotnet test --no-build`).
+- [x] Validate against the acceptance criteria in `spec.md`.
+- [ ] Move the feature to "Done" in `../../constitution/roadmap.md` and remove the corresponding bullet from "Backlog / ideas". (Backlog bullet already removed; full "Done" move happens once this PR merges into `development`.)

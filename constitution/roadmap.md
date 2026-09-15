@@ -9,7 +9,7 @@
 
 ## Next 🔜
 
-1. **005 · Country/State/City lookup proxy endpoints** — `GET /api/countries`, `/api/countries/{code}/states`, `/api/countries/{code}/states/{state}/cities`, backed by the `ICountryReferenceDataService` cache introduced in 002. Implemented; pending `dotnet build`/`dotnet test` verification (not runnable in this session's sandbox — no local .NET SDK or Docker daemon available) before moving to Done.
+1. **005 · Country/State/City lookup proxy endpoints** — `GET /api/countries`, `/api/countries/{code}/states`, `/api/countries/{code}/states/{state}/cities`, backed by the `ICountryReferenceDataService` cache introduced in 002. Implemented, CI green (build + format + full test suite) on [PR #8](https://github.com/EMarin96/stock-flow-api/pull/8); moves to Done once merged into `development`.
 
 ## Backlog / ideas 💡
 

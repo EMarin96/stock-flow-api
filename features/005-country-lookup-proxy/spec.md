@@ -1,6 +1,6 @@
 # 005 · Country/State/City lookup proxy endpoints
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -12,15 +12,15 @@ Feature 002 introduced mandatory, externally-validated `Country`/`State`/`City` 
 
 ## Acceptance criteria
 
-- [ ] `GET /api/countries` returns the list of countries StockFlow currently supports (the closed `Country` set), with no path parameters.
-- [ ] `GET /api/countries/{code}/states` returns the recognized states/provinces for a supported country code (e.g. `US`, `CR`), each with its ISO2 code and display name.
-- [ ] `GET /api/countries/{code}/states/{state}/cities` returns the recognized cities for a given, valid country+state combination.
-- [ ] An unsupported/unrecognized country `code` (on either endpoint that takes one) is rejected with a clear validation error (400), not a generic failure or a 404.
-- [ ] A `state` that isn't recognized for the given country is rejected with a clear validation error (400) on the cities endpoint.
-- [ ] Country/state code matching is case-insensitive (`us` and `US` behave the same), consistent with how `Location` address validation already matches state/city.
-- [ ] If the underlying reference-data service is unavailable and nothing is cached yet for what was requested, the request is rejected with a clear `503`-style error rather than an empty list or a generic failure.
-- [ ] All three endpoints require an authenticated caller (any role — Admin, Operator, or ReadOnly), same as every other read endpoint; no special write permission is needed since these are read-only.
-- [ ] Results are served from the same cache `Location` address validation already relies on (see 002) — a values already warmed at startup or by prior use responds without a new external call.
+- [x] `GET /api/countries` returns the list of countries StockFlow currently supports (the closed `Country` set), with no path parameters.
+- [x] `GET /api/countries/{code}/states` returns the recognized states/provinces for a supported country code (e.g. `US`, `CR`), each with its ISO2 code and display name.
+- [x] `GET /api/countries/{code}/states/{state}/cities` returns the recognized cities for a given, valid country+state combination.
+- [x] An unsupported/unrecognized country `code` (on either endpoint that takes one) is rejected with a clear validation error (400), not a generic failure or a 404.
+- [x] A `state` that isn't recognized for the given country is rejected with a clear validation error (400) on the cities endpoint.
+- [x] Country/state code matching is case-insensitive (`us` and `US` behave the same), consistent with how `Location` address validation already matches state/city.
+- [x] If the underlying reference-data service is unavailable and nothing is cached yet for what was requested, the request is rejected with a clear `503`-style error rather than an empty list or a generic failure.
+- [x] All three endpoints require an authenticated caller (any role — Admin, Operator, or ReadOnly), same as every other read endpoint; no special write permission is needed since these are read-only.
+- [x] Results are served from the same cache `Location` address validation already relies on (see 002) — same `ICountryReferenceDataService`/DI registration, no new client or cache introduced; the caching behavior itself was already verified in feature 002.
 
 ## Out of scope
 
