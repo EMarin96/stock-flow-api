@@ -9,12 +9,11 @@
 
 ## Next 🔜
 
-_None yet._
+1. **005 · Country/State/City lookup proxy endpoints** — `GET /api/countries`, `/api/countries/{code}/states`, `/api/countries/{code}/states/{state}/cities`, backed by the `ICountryReferenceDataService` cache introduced in 002. Implemented; pending `dotnet build`/`dotnet test` verification (not runnable in this session's sandbox — no local .NET SDK or Docker daemon available) before moving to Done.
 
 ## Backlog / ideas 💡
 
 - **Low-stock alerts** — notify when a product falls below its minimum stock threshold.
 - **Reporting / read-only views** — reporting endpoints for the read-only role.
-- **Country/State/City lookup proxy endpoints** — expose `GET /api/countries`, `/api/countries/{code}/states`, `/api/countries/{code}/states/{state}/cities` backed by the `ICountryReferenceDataService` cache introduced in 002, so the frontend can populate address dropdowns through this API instead of calling the external provider directly.
 
 > Every new feature is created as `features/NNN-feature-name/` with `spec.md`, `plan.md`, and `tasks.md` before touching any code.
