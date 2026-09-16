@@ -15,4 +15,4 @@ _Actionable checklist derived from `plan.md`. Small, concrete tasks; mark `[x]` 
 - [x] Run `dotnet format` and `dotnet build`. Verified via PR #8's `build-and-test` CI check (restore, build, `dotnet format --verify-no-changes`) — all green.
 - [x] Run `dotnet test` — full suite green. Verified via the same CI check (`dotnet test --no-build`).
 - [x] Validate against the acceptance criteria in `spec.md`.
-- [ ] Move the feature to "Done" in `../../constitution/roadmap.md` and remove the corresponding bullet from "Backlog / ideas". (Backlog bullet already removed; full "Done" move happens once this PR merges into `development`.)
+- [x] Move the feature to "Done" in `../../constitution/roadmap.md` and remove the corresponding bullet from "Backlog / ideas". Merged via [PR #8](https://github.com/EMarin96/stock-flow-api/pull/8).
