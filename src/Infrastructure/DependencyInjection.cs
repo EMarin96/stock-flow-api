@@ -4,12 +4,14 @@ using StockFlow.Application.Common.Persistence;
 using StockFlow.Application.Common.Security;
 using StockFlow.Application.Locations.Shared;
 using StockFlow.Application.Products.Shared;
+using StockFlow.Application.Reporting.Shared;
 using StockFlow.Application.StockMovements.Shared;
 using StockFlow.Application.Users.Shared;
 using StockFlow.Infrastructure.ExternalServices.CountryStateCity;
 using StockFlow.Infrastructure.Persistence;
 using StockFlow.Infrastructure.Persistence.Repositories.Locations;
 using StockFlow.Infrastructure.Persistence.Repositories.Products;
+using StockFlow.Infrastructure.Persistence.Repositories.Reporting;
 using StockFlow.Infrastructure.Persistence.Repositories.StockMovements;
 using StockFlow.Infrastructure.Persistence.Repositories.Users;
 using StockFlow.Infrastructure.Security;
@@ -37,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IStockLevelReadRepository, StockLevelReadRepository>();
         services.AddScoped<IUserWriteRepository, UserWriteRepository>();
         services.AddScoped<IUserReadRepository, UserReadRepository>();
+        services.AddScoped<IReportingReadRepository, ReportingReadRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IPasswordHasher, PasswordHasher>();

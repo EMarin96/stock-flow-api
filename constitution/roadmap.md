@@ -10,11 +10,10 @@
 
 ## Next 🔜
 
-_None yet._
+1. **006 · Reporting / read-only views** — `GET /api/reports/stock-overview` (total stock per product summed across locations, with a low-stock flag) and `GET /api/reports/movement-activity` (stock movements grouped by product+type within an optional date range), open on [PR #10](https://github.com/EMarin96/stock-flow-api/pull/10).
 
 ## Backlog / ideas 💡
 
 - **Low-stock alerts** — notify when a product falls below its minimum stock threshold.
-- **Reporting / read-only views** — reporting endpoints for the read-only role.
 
 > Every new feature is created as `features/NNN-feature-name/` with `spec.md`, `plan.md`, and `tasks.md` before touching any code.
