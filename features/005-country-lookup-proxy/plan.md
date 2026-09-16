@@ -1,0 +1,41 @@
+# 005 · Country/State/City lookup proxy endpoints — Plan
+
+_How what's described in `spec.md` is implemented. Must respect the `constitution/`._
+
+## Approach
+
+A thin, read-only Vertical Slice under `src/Application/Countries/`, mirroring the shape of `src/Application/Locations/` (one folder per query). No new entity, no persistence, no EF/Dapper — every query is answered directly from the `ICountryReferenceDataService` already built and cached in feature 002 (`src/Infrastructure/ExternalServices/CountryStateCity/`). Consumed as-is from its current location (`StockFlow.Application.Locations.Shared`) rather than relocated to a `Common` folder — it already has exactly one other consumer (`Locations`), and moving it would touch ~10 shipped/tested files for a purely cosmetic gain; revisit only if a third consumer appears.
+
+## Implementation
+
+1. `src/Application/Countries/Shared/CountryErrors.cs` — new static error factory, own error codes (`Countries.*`, distinct from `Locations.*` per the one-`Errors`-class-per-feature convention): `InvalidCountryCode(code)`, `InvalidState(country, state)`, `ReferenceDataUnavailable()` — all `Error.Validation` except the last (`Error.Unavailable`, mirroring `LocationErrors.ReferenceDataUnavailable`).
+2. `src/Application/Countries/Shared/CountryCodeParser.cs` — `static bool TryParse(string code, out Country country)` wrapping `Enum.TryParse<Country>(code, ignoreCase: true, out country)`, shared by `GetStates`/`GetCities` handlers so the case-insensitive-parse rule lives in one place, not two.
+3. `src/Application/Countries/GetCountries/` — `GetCountriesQuery : IRequest<Result<IReadOnlyList<CountryDto>>>` (no parameters) + Handler: `Enum.GetValues<Country>()` mapped to `CountryDto(Code)`, always `Result.Success` (no I/O, no failure path — the set is a compile-time constant).
+4. `src/Application/Countries/GetStates/` — `GetStatesQuery(string CountryCode) : IRequest<Result<IReadOnlyList<StateDto>>>` + Handler: parse `CountryCode` via `CountryCodeParser`, `CountryErrors.InvalidCountryCode` on failure; otherwise call `ICountryReferenceDataService.GetStatesAsync`, catching `ReferenceDataUnavailableException` → `CountryErrors.ReferenceDataUnavailable()`; map to `StateDto(Iso2, Name)`.
+5. `src/Application/Countries/GetCities/` — `GetCitiesQuery(string CountryCode, string StateIso2) : IRequest<Result<IReadOnlyList<CityDto>>>` + Handler: parse `CountryCode` (same as above); call `GetStatesAsync`, find a case-insensitive match for `StateIso2` — no match → `CountryErrors.InvalidState(country, StateIso2)` (mirrors `AddressReferenceDataValidator`'s state-then-city order, so an unrecognized state is reported before attempting a cities call); on a match, call `GetCitiesAsync(country, matchedState.Iso2, ct)`, both calls wrapped for `ReferenceDataUnavailableException` → `CountryErrors.ReferenceDataUnavailable()`; map to `CityDto(Name)`.
+6. `src/Application/Countries/Shared/CountryDto.cs`, `StateDto.cs`, `CityDto.cs` — flat records: `CountryDto(string Code)`, `StateDto(string Iso2, string Name)`, `CityDto(string Name)`.
+7. `src/Api/Endpoints/CountryEndpoints.cs` — `MapCountryEndpoints`, group `/api/countries` tagged `"Countries"`:
+   - `GET /` → `GetCountriesQuery` → `Produces<IReadOnlyList<CountryDto>>()`.
+   - `GET /{code}/states` → `GetStatesQuery(code)` → `Produces<IReadOnlyList<StateDto>>()`, `ProducesValidationProblem()`, `ProducesProblem(503)`.
+   - `GET /{code}/states/{state}/cities` → `GetCitiesQuery(code, state)` → `Produces<IReadOnlyList<CityDto>>()`, `ProducesValidationProblem()`, `ProducesProblem(503)`.
+   No `.RequireAuthorization(...)` call on any of the three — same as `GetLocationById`/`GetLocations`, they fall through to the global fallback policy (`RequireAuthenticatedUser()`, any role), matching the spec's "any role" requirement.
+8. `Program.cs` — add `app.MapCountryEndpoints();` next to the other `Map*Endpoints()` calls. No new DI registration needed — `ICountryReferenceDataService` and its cache are already registered by `AddCountryStateCityIntegration` (feature 002).
+9. Tests:
+   - `tests/StockFlow.Tests/Application/Countries/GetCountries/GetCountriesHandlerTests.cs` — returns both `US` and `CR`.
+   - `tests/StockFlow.Tests/Application/Countries/GetStates/GetStatesHandlerTests.cs` — valid country, invalid/unsupported country code, `ReferenceDataUnavailableException` → `ReferenceDataUnavailable`, using the existing `InMemoryCountryReferenceDataService`/`UnavailableCountryReferenceDataService` test doubles (no new fakes needed).
+   - `tests/StockFlow.Tests/Application/Countries/GetCities/GetCitiesHandlerTests.cs` — valid country+state, invalid country code, unrecognized state, reference-data-unavailable on both the states and cities call.
+   - `tests/StockFlow.Tests/Api/Countries/CountryEndpointsTests.cs` — integration tests for the 3 endpoints against `ApiFactory` (already registers `InMemoryCountryReferenceDataService` globally, per `tests/StockFlow.Tests/Api/ApiFactory.cs:72-73` — no new test-infra wiring required), covering: 200 for each endpoint, 400 for a bad country code and a bad state, 401 with no token (relies on the existing fallback-policy integration test pattern), and that a ReadOnly-role token succeeds (proving no write-role restriction was accidentally applied).
+
+## Decisions
+
+- **`ICountryReferenceDataService` stays in `Locations/Shared`, not relocated to a `Common` folder** — it now has two consumers (`Locations`, `Countries`) but relocating would touch every file that references it (handlers, the Infrastructure implementation, DI registration, both test doubles, `ApiFactory`) for a naming/location concern only, no behavior change. Deferred until/unless a third consumer makes the cross-feature dependency harder to justify.
+- **No FluentValidation validator classes for `GetStates`/`GetCities`** — unlike `Create`/`UpdateLocation`, these queries take one or two simple route-string parameters with a single parsing rule (case-insensitive enum/lookup match) each, already centralized in `CountryCodeParser`/the handler's state lookup; a dedicated `IValidator<T>` would be pure ceremony for a single check already expressed as a guard clause, same reasoning as why `GetLocationByIdQuery` has no validator today.
+- **`GetCitiesQuery` validates the state exists (via `GetStatesAsync`) before fetching cities**, rather than calling `GetCitiesAsync` directly with an unchecked `StateIso2` — mirrors `AddressReferenceDataValidator`'s existing order (state before city) and gives a precise `InvalidState` error instead of silently returning an empty city list for a typo'd state code.
+- **Own `CountryErrors` class, not reusing `LocationErrors`** — same convention as every other feature (`ProductErrors`, `LocationErrors`): one shared `Errors` static class per feature, even though the underlying failure modes (invalid state, reference data down) are conceptually the same ones `Locations` already has. Error codes are namespaced separately (`Countries.*`) so a client can tell which endpoint produced the error from the code alone.
+- **No pagination on any of the three endpoints** — per `spec.md` Out of scope: the data set is small enough (2 countries, dozens of states, at most a few hundred cities per state) that pagination would add complexity with no real benefit, unlike `GetLocations`/`GetProducts`.
+
+## Risks
+
+- **A third consumer of `ICountryReferenceDataService` appearing later** without ever prompting the `Locations` → `Common` relocation, leaving the cross-feature dependency undocumented — mitigated by this plan calling the tradeoff out explicitly (see Decisions) so it's a conscious, revisitable choice rather than an accident.
+- **External API outage on a never-before-requested `(Country, State)` pair** — same risk already accepted and mitigated in feature 002 (cache warmed for states at startup, cities cached lazily); this feature adds no new exposure, it surfaces the existing `ReferenceDataUnavailable` failure mode through a new path.
+- **Country code parsing drifting out of sync between this feature and `Location`'s own `Country` binding** if `CountryCodeParser` isn't reused everywhere a country code needs parsing from a string — mitigated by centralizing it in one helper used by both `GetStates` and `GetCities` handlers from the start.

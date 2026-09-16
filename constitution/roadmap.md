@@ -9,12 +9,11 @@
 
 ## Next 🔜
 
-_None yet._
+1. **005 · Country/State/City lookup proxy endpoints** — `GET /api/countries`, `/api/countries/{code}/states`, `/api/countries/{code}/states/{state}/cities`, backed by the `ICountryReferenceDataService` cache introduced in 002. Implemented, CI green (build + format + full test suite) on [PR #8](https://github.com/EMarin96/stock-flow-api/pull/8); moves to Done once merged into `development`.
 
 ## Backlog / ideas 💡
 
 - **Low-stock alerts** — notify when a product falls below its minimum stock threshold.
 - **Reporting / read-only views** — reporting endpoints for the read-only role.
-- **Country/State/City lookup proxy endpoints** — expose `GET /api/countries`, `/api/countries/{code}/states`, `/api/countries/{code}/states/{state}/cities` backed by the `ICountryReferenceDataService` cache introduced in 002, so the frontend can populate address dropdowns through this API instead of calling the external provider directly.
 
 > Every new feature is created as `features/NNN-feature-name/` with `spec.md`, `plan.md`, and `tasks.md` before touching any code.
