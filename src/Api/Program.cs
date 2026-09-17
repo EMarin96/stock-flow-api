@@ -52,6 +52,7 @@ app.MapProductEndpoints();
 app.MapLocationEndpoints();
 app.MapStockMovementEndpoints();
 app.MapCountryEndpoints();
+app.MapReportingEndpoints();
 
 app.Run();
 
