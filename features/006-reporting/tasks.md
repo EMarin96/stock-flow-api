@@ -14,7 +14,7 @@ _Actionable checklist derived from `plan.md`. Small, concrete tasks; mark `[x]` 
 - [x] `tests/StockFlow.Tests/TestDoubles/InMemoryReportingReadRepository.cs`.
 - [x] Unit tests: `GetStockOverviewHandlerTests`, `GetMovementActivityHandlerTests`.
 - [x] Integration tests: `tests/StockFlow.Tests/Api/Reporting/ReportingEndpointsTests.cs`.
-- [ ] Run `dotnet format` and `dotnet build`. **Not run locally** — no .NET SDK/Docker daemon in this sandbox; relying on the PR's `build-and-test` CI check.
-- [ ] Run `dotnet test` — full suite green. **Not run locally**, same reason; relying on CI.
-- [ ] Validate against the acceptance criteria in `spec.md`.
-- [ ] Move the feature to "Done" in `../../constitution/roadmap.md` and remove the corresponding bullet from "Backlog / ideas".
+- [x] Run `dotnet format` and `dotnet build`. Verified via [PR #10](https://github.com/EMarin96/stock-flow-api/pull/10)'s `build-and-test` CI check (restore, build, `dotnet format --verify-no-changes`) — all green.
+- [x] Run `dotnet test` — full suite green. Verified via the same CI check (`dotnet test --no-build`).
+- [x] Validate against the acceptance criteria in `spec.md`.
+- [x] Move the feature to "Done" in `../../constitution/roadmap.md` and remove the corresponding bullet from "Backlog / ideas". Merged via [PR #10](https://github.com/EMarin96/stock-flow-api/pull/10).
