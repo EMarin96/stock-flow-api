@@ -1,6 +1,6 @@
 # 006 · Reporting / read-only views
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -15,16 +15,16 @@ Two read-only reporting endpoints, available to any authenticated role (Admin, O
 
 ## Acceptance criteria
 
-- [ ] `GET /api/reports/stock-overview` returns, for every active (non-deleted) product, its SKU, name, minimum stock threshold, and total quantity summed across all locations (a product with no stock anywhere shows `0`, not an omitted row).
-- [ ] Each stock-overview row flags whether the product is currently at or below its minimum stock threshold.
-- [ ] `GET /api/reports/stock-overview?lowStockOnly=true` returns only the products flagged as at/below threshold; omitting the parameter (or `false`) returns every active product.
-- [ ] `GET /api/reports/stock-overview` is paginated the same way as every other list endpoint (`page`/`pageSize`, capped, validated).
-- [ ] `GET /api/reports/movement-activity` returns one row per distinct product+movement-type combination that had at least one movement in the (optionally filtered) window, with the movement count and total quantity for that combination.
-- [ ] `GET /api/reports/movement-activity` can be filtered by `from`/`to` (a movement's `CreatedAt` falls within the range, either bound optional), `productId`, and/or `locationId` (matching either the source or destination, same convention as the existing movements list).
-- [ ] `GET /api/reports/movement-activity?from=...&to=...` with `from` after `to` is rejected with a clear validation error (400), not a generic failure or empty result.
-- [ ] `GET /api/reports/movement-activity` is paginated the same way as every other list endpoint.
-- [ ] Both endpoints are reachable by every role (Admin, Operator, ReadOnly) — no write access is required to read a report, consistent with every other GET endpoint in the API.
-- [ ] Both endpoints require authentication (401 with no/invalid token), same as every other endpoint.
+- [x] `GET /api/reports/stock-overview` returns, for every active (non-deleted) product, its SKU, name, minimum stock threshold, and total quantity summed across all locations (a product with no stock anywhere shows `0`, not an omitted row).
+- [x] Each stock-overview row flags whether the product is currently at or below its minimum stock threshold.
+- [x] `GET /api/reports/stock-overview?lowStockOnly=true` returns only the products flagged as at/below threshold; omitting the parameter (or `false`) returns every active product.
+- [x] `GET /api/reports/stock-overview` is paginated the same way as every other list endpoint (`page`/`pageSize`, capped, validated).
+- [x] `GET /api/reports/movement-activity` returns one row per distinct product+movement-type combination that had at least one movement in the (optionally filtered) window, with the movement count and total quantity for that combination.
+- [x] `GET /api/reports/movement-activity` can be filtered by `from`/`to` (a movement's `CreatedAt` falls within the range, either bound optional), `productId`, and/or `locationId` (matching either the source or destination, same convention as the existing movements list).
+- [x] `GET /api/reports/movement-activity?from=...&to=...` with `from` after `to` is rejected with a clear validation error (400), not a generic failure or empty result.
+- [x] `GET /api/reports/movement-activity` is paginated the same way as every other list endpoint.
+- [x] Both endpoints are reachable by every role (Admin, Operator, ReadOnly) — no write access is required to read a report, consistent with every other GET endpoint in the API.
+- [x] Both endpoints require authentication (401 with no/invalid token), same as every other endpoint.
 
 ## Out of scope
 
